@@ -1,0 +1,12 @@
+note over selain:
+selain lisää uuden muistiinpanon listaan
+ja päivittää näkymän dynaamisesti
+end note
+
+selain->palvelin: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa\n{ content: "xyz", date: "..." }
+
+note over palvelin:
+palvelin tallentaa uuden muistiinpanon
+end note
+
+palvelin-->selain: { message: "note created" }
