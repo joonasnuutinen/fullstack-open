@@ -1,10 +1,22 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 
+const Anecdote = ({ text, votes }) => (
+  <div>
+    <div>{text}</div>
+    <div>has {votes} votes</div>
+  </div>
+)
+
+const Button = ({ onClick, text }) =>
+  <button onClick={onClick}>{text}</button>
+
 const App = ({ anecdotes }) => {
   const randomIndex = () => Math.floor(Math.random() * anecdotes.length)
   const [selected, setSelected] = useState(randomIndex)
   const [points, setPoints] = useState(anecdotes.map(() => 0))
+  const maxVotes = Math.max(...points)
+  const mostVoted = points.indexOf(maxVotes)
 
   const vote = (i) => {
     const newPoints = [...points]
@@ -14,10 +26,13 @@ const App = ({ anecdotes }) => {
 
   return (
     <div>
-      <div>{anecdotes[selected]}</div>
-      <div>has {points[selected]} votes</div>
-      <button onClick={() => vote(selected)}>vote</button>
-      <button onClick={() => setSelected(randomIndex)}>next anecdote</button>
+      <h2>Anecdote of the day</h2>
+      <Anecdote text={anecdotes[selected]} votes={points[selected]} />
+      <Button onClick={() => vote(selected)} text="vote" />
+      <Button onClick={() => setSelected(randomIndex)} text="next anecdote" />
+
+      <h2>Anecdote with most votes</h2>
+      <Anecdote text={anecdotes[mostVoted]} votes={points[mostVoted]} />
     </div>
   )
 }
