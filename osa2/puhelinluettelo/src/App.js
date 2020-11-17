@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
 
 const Input = ({ label, value, onChange }) => (
   <div>
@@ -29,7 +30,9 @@ const PersonForm = (props) => {
 
 const PersonsList = ({ persons, filter }) => (
   <div>
-    {persons.filter(person => person.name.toUpperCase().includes(filter.toUpperCase())).map(person => <Person key={person.name} person={person} />)}
+    {persons
+      .filter(person => person.name.toUpperCase().includes(filter.toUpperCase()))
+      .map(person => <Person key={person.name} person={person} />)}
   </div>
 )
 
@@ -40,6 +43,14 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        setPersons(response.data)
+      })
+  }, [])
   
   const addPerson = (event) => {
     event.preventDefault()
