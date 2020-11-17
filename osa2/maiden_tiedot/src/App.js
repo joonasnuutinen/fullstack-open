@@ -10,10 +10,19 @@ const Search = ({ value, onChange }) => {
   )
 }
 
-const CountryNames = ({ countries }) => {
+const CountryName = ({ country, onShowCountry }) => {
   return (
     <div>
-      {countries.map(country => <div key={country.alpha3Code}>{country.name}</div>)}
+      {country.name}
+      <button onClick={() => onShowCountry(country.name)}>show</button>
+    </div>
+  )
+}
+
+const CountryNames = ({ countries, onShowCountry }) => {
+  return (
+    <div>
+      {countries.map(country => <CountryName key={country.alpha3Code} country={country} onShowCountry={onShowCountry} />)}
     </div>
   )
 }
@@ -39,7 +48,7 @@ const Country = ({ country }) => {
   )
 }
 
-const Result = ({ countries, filter }) => {
+const Result = ({ countries, filter, onShowCountry }) => {
   const filteredCountries = countries.filter(country => country.name.toUpperCase().includes(filter.toUpperCase()))
 
   if (filter === '') {
@@ -56,7 +65,7 @@ const Result = ({ countries, filter }) => {
 
   if (filteredCountries.length > 1) {
     return (
-      <CountryNames countries={filteredCountries} />
+      <CountryNames countries={filteredCountries} onShowCountry={onShowCountry} />
     )
   }
 
@@ -90,7 +99,7 @@ const App = () => {
   return (
     <div>
       <Search value={filter} onChange={handleFilterChange} />
-      <Result countries={countries} filter={filter} />
+      <Result countries={countries} filter={filter} onShowCountry={setFilter} />
     </div>
   )
 }
