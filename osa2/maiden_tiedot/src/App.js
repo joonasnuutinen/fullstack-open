@@ -35,6 +35,51 @@ const LanguageList = ({ languages }) => {
   )
 }
 
+const Weather = ({ location }) => {
+  const [status, setStatus] = useState('loading')
+  const [weather, setWeather] = useState({})
+  useEffect(() => {
+    const key = process.env.REACT_APP_API_KEY
+    const query = encodeURI(location)
+    axios
+      .get(`http://api.weatherstack.com/current?access_key=${key}&query=${query}`)
+      .then(response => {
+        if (response.status !== 200 || !response.data || response.data.error) {
+          setStatus('error')
+          return
+        }
+        setStatus('loaded')
+        setWeather(response.data.current)
+      })
+  }, [location])
+  
+  if (status === 'loading') {
+    return (
+      <div>Loading...</div>
+    )
+  }
+
+  if (status === 'error') {
+    return (
+      <div>An error occurred while loading weather data</div>
+    )
+  }
+
+  return (
+    <div>
+      <div>
+        <b>temperature:</b> {weather?.temperature} Celcius
+      </div>
+      <div>
+        <img src={weather?.weather_icons?.[0]} alt={weather?.weather_descriptions?.[0]} />
+      </div>
+      <div>
+        <b>wind:</b> {weather?.wind_speed} mph direction {weather?.wind_dir}
+      </div>
+    </div>
+  )
+}
+
 const Country = ({ country }) => {
   return (
     <div>
@@ -44,6 +89,8 @@ const Country = ({ country }) => {
       <h3>languages</h3>
       <LanguageList languages={country.languages} />
       <img src={country.flag} alt={`The flag of ${country.name}`} height="100" />
+      <h3>Weather in {country.capital}</h3>
+      <Weather location={country.capital} />
     </div>
   )
 }
