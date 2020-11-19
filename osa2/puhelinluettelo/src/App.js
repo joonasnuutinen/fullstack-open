@@ -42,11 +42,33 @@ const Person = ({ person, removePerson }) => (
   </div>
 )
 
+const Message = ({ msg }) => {
+  if (msg === null) {
+    return null
+  }
+
+  const messageStyle = {
+    color: 'green',
+    padding: 10,
+    background: 'lightgray',
+    borderStyle: 'solid',
+    borderRadius: 5,
+    marginBottom: 10
+  }
+
+  return (
+    <div style={messageStyle}>
+      {msg}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {
     personService
@@ -71,6 +93,7 @@ const App = () => {
           setPersons(persons.map(p => p.id === returnedPerson.id ? returnedPerson : p))
           setNewName('')
           setNewNumber('')
+          showMessage(`Updated ${newName}`)
         })
       return
     }
@@ -87,17 +110,20 @@ const App = () => {
         setPersons(persons.concat(createdPerson))
         setNewName('')
         setNewNumber('')
+        showMessage(`Added ${newName}`)
       })
   }
 
   const removePerson = (id) => {
-    if (!window.confirm(`Delete ${persons.find(person => person.id === id).name}?`)) {
+    const name = persons.find(person => person.id === id).name
+    if (!window.confirm(`Delete ${name}?`)) {
       return
     }
     personService
       .remove(id)
       .then(() => {
         setPersons(persons.filter(person => person.id !== id))
+        showMessage(`Deleted ${name}`)
       })
   }
 
@@ -112,10 +138,18 @@ const App = () => {
   const handleFilterChange = (event) => {
     setNewFilter(event.target.value)
   }
+
+  const showMessage = (msg) => {
+    setMessage(msg)
+    setTimeout(() => {
+      setMessage(null)
+    }, 3000)
+  }
   
   return (
     <div>
       <h1>Phonebook</h1>
+      <Message msg={message} />
       <Input label="filter" value={newFilter} onChange={handleFilterChange} />
       <h2>Add new</h2>
       <PersonForm
