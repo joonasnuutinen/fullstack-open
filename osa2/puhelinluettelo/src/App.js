@@ -28,15 +28,19 @@ const PersonForm = (props) => {
   )
 }
 
-const PersonsList = ({ persons, filter }) => (
+const PersonsList = ({ persons, filter, removePerson }) => (
   <div>
     {persons
       .filter(person => person.name.toUpperCase().includes(filter.toUpperCase()))
-      .map(person => <Person key={person.name} person={person} />)}
+      .map(person => <Person key={person.name} person={person} removePerson={removePerson} />)}
   </div>
 )
 
-const Person = ({ person }) => <p>{person.name} {person.number}</p>
+const Person = ({ person, removePerson }) => (
+  <div>
+    {person.name} {person.number} <button onClick={() => removePerson(person.id)}>delete</button>
+  </div>
+)
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -71,6 +75,17 @@ const App = () => {
       })
   }
 
+  const removePerson = (id) => {
+    if (!window.confirm(`Delete ${persons.find(person => person.id === id).name}?`)) {
+      return
+    }
+    personService
+      .remove(id)
+      .then(() => {
+        setPersons(persons.filter(person => person.id !== id))
+      })
+  }
+
   const handleNameChange = (event) => {
     setNewName(event.target.value)
   }
@@ -97,7 +112,7 @@ const App = () => {
       />
       
       <h2>Numbers</h2>
-      <PersonsList persons={persons} filter={newFilter} />
+      <PersonsList persons={persons} filter={newFilter} removePerson={removePerson} />
     </div>
   );
 }
