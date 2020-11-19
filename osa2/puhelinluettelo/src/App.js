@@ -47,8 +47,13 @@ const Message = ({ msg }) => {
     return null
   }
 
+  const colors = {
+    default: 'green',
+    error: 'red'
+  }
+
   const messageStyle = {
-    color: 'green',
+    color: colors[msg.type] || colors.default,
     padding: 10,
     background: 'lightgray',
     borderStyle: 'solid',
@@ -58,7 +63,7 @@ const Message = ({ msg }) => {
 
   return (
     <div style={messageStyle}>
-      {msg}
+      {msg.content}
     </div>
   )
 }
@@ -93,7 +98,14 @@ const App = () => {
           setPersons(persons.map(p => p.id === returnedPerson.id ? returnedPerson : p))
           setNewName('')
           setNewNumber('')
-          showMessage(`Updated ${newName}`)
+          showMessage({ content: `Updated ${newName}` })
+        })
+        .catch(() => {
+          showMessage({
+            type: 'error',
+            content: `Information of ${newName} has already been removed from the server`
+          })
+          setPersons(persons.filter(p => p.id !== updatedPerson.id))
         })
       return
     }
@@ -110,7 +122,7 @@ const App = () => {
         setPersons(persons.concat(createdPerson))
         setNewName('')
         setNewNumber('')
-        showMessage(`Added ${newName}`)
+        showMessage({ content: `Added ${newName}` })
       })
   }
 
@@ -123,7 +135,7 @@ const App = () => {
       .remove(id)
       .then(() => {
         setPersons(persons.filter(person => person.id !== id))
-        showMessage(`Deleted ${name}`)
+        showMessage({ content: `Deleted ${name}` })
       })
   }
 
@@ -143,7 +155,7 @@ const App = () => {
     setMessage(msg)
     setTimeout(() => {
       setMessage(null)
-    }, 3000)
+    }, 5000)
   }
   
   return (
