@@ -32,7 +32,7 @@ const PersonsList = ({ persons, filter, removePerson }) => (
   <div>
     {persons
       .filter(person => person.name.toUpperCase().includes(filter.toUpperCase()))
-      .map(person => <Person key={person.name} person={person} removePerson={removePerson} />)}
+      .map(person => <Person key={person.id} person={person} removePerson={removePerson} />)}
   </div>
 )
 
@@ -59,8 +59,23 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
     if (persons.map(person => person.name).indexOf(newName) !== -1) {
-      return alert(`${newName} is already added to phonebook`)
+      if (!window.confirm(`${newName} is already added to phonebook. Replace the old number with a new one?`)) {
+        return
+      }
+      // Update existing
+      const existingPerson = persons.find(person => person.name === newName)
+      const updatedPerson = { ...existingPerson, number: newNumber }
+      personService
+        .update(updatedPerson)
+        .then(returnedPerson => {
+          setPersons(persons.map(p => p.id === returnedPerson.id ? returnedPerson : p))
+          setNewName('')
+          setNewNumber('')
+        })
+      return
     }
+
+    // Add new
     const newPerson = {
       name: newName,
       number: newNumber
