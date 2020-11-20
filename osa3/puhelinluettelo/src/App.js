@@ -124,6 +124,12 @@ const App = () => {
         setNewNumber('')
         showMessage({ content: `Added ${newName}` })
       })
+      .catch(err => {
+        showMessage({
+          type: 'error',
+          content: err.response.data.error,
+        })
+      })
   }
 
   const removePerson = (id) => {
