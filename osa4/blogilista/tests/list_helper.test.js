@@ -46,3 +46,14 @@ describe('favorite blog', () => {
     expect(favoriteBlog(manyBlogs)).toEqual(fav)
   })
 })
+
+describe('most blogs', () => {
+  const mostBlogs = listHelper.mostBlogs
+  test('of one blog returns its author and count 1', () => {
+    expect(mostBlogs(oneBlog)).toEqual({ author: 'Edsger W. Dijkstra', blogs: 1 })
+  })
+
+  test('of many blogs returns the right value', () => {
+    expect(mostBlogs(manyBlogs)).toEqual({ author: 'Robert C. Martin', blogs: 3 })
+  })
+})
