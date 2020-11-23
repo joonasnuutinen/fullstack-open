@@ -35,6 +35,14 @@ test('all notes are returned', async () => {
   expect(response.body).toHaveLength(initialBlogs.length)
 })
 
+test('identifying field is named "id"', async () => {
+  const response = await api.get('/api/blogs')
+  response.body.forEach(blog => {
+    expect(blog.id).toBeDefined()
+    expect(blog._id).not.toBeDefined()
+  })
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
