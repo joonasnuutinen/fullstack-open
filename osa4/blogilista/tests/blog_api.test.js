@@ -52,6 +52,22 @@ test('new blog can be added', async () => {
   expect(storedBlogsMin).toContainEqual(newBlog)
 })
 
+test('likes is 0 by default', async () => {
+  const newBlog = {
+    title: 'Test blog',
+    author: 'jest',
+    url: 'https://jestjs.io/',
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+
+  const storedBlog = await Blog.findOne(newBlog)
+  expect(storedBlog.likes).toBe(0)
+
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
