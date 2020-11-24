@@ -102,6 +102,38 @@ describe('adding a new blog', () => {
   })
 })
 
+describe('deleting a blog', () => {
+  test('succeeds with a valid id', async () => {
+    const storedBlogs = await helper.storedBlogs()
+    const blogToDelete = storedBlogs[0]
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const storedBlogsAfterDeletion = await helper.storedBlogs()
+    expect(storedBlogsAfterDeletion).toHaveLength(storedBlogs.length - 1)
+    expect(storedBlogsAfterDeletion.map(b => b.id)).not.toContain(blogToDelete.id)
+  })
+
+  test('if id is not found returns status code 204 and does not affect database', async () => {
+    const nonExistingId = await helper.nonExistingId()
+    await api
+      .delete(`/api/blogs/${nonExistingId}`)
+      .expect(204)
+    const storedAfter = await helper.storedBlogs()
+    expect(storedAfter).toHaveLength(helper.initialBlogs.length)
+  })
+
+  test('if id is invalid returns status code 400', async () => {
+    const invalidId = '12345'
+    await api
+      .delete(`/api/blogs/${invalidId}`)
+      .expect(400)
+    const storedAfter = await helper.storedBlogs()
+    expect(storedAfter).toHaveLength(helper.initialBlogs.length)
+  })
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
