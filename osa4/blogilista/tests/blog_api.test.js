@@ -10,92 +10,96 @@ beforeEach(async () => {
   await Blog.insertMany(helper.initialBlogs)
 })
 
-test('notes are returned as json', async () => {
-  await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-})
+describe('when getting blogs', () => {
+  test('blogs are returned as json', async () => {
+    await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  })
 
-test('all notes are returned', async () => {
-  const response = await api.get('/api/blogs')
-  expect(response.body).toHaveLength(helper.initialBlogs.length)
-})
+  test('all blogs are returned', async () => {
+    const response = await api.get('/api/blogs')
+    expect(response.body).toHaveLength(helper.initialBlogs.length)
+  })
 
-test('identifying field is named "id"', async () => {
-  const response = await api.get('/api/blogs')
-  response.body.forEach(blog => {
-    expect(blog.id).toBeDefined()
-    expect(blog._id).not.toBeDefined()
+  test('identifying field is named "id"', async () => {
+    const response = await api.get('/api/blogs')
+    response.body.forEach(blog => {
+      expect(blog.id).toBeDefined()
+      expect(blog._id).not.toBeDefined()
+    })
   })
 })
 
-test('new blog can be added', async () => {
-  const newBlog = {
-    title: 'Test blog',
-    author: 'jest',
-    url: 'https://jestjs.io/',
-    likes: 12,
-  }
+describe('adding a new blog', () => {
+  test('succeeds with valid data', async () => {
+    const newBlog = {
+      title: 'Test blog',
+      author: 'jest',
+      url: 'https://jestjs.io/',
+      likes: 12,
+    }
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
 
-  const storedBlogs = await helper.storedBlogs()
-  expect(storedBlogs).toHaveLength(helper.initialBlogs.length + 1)
-  const storedBlogsMin = storedBlogs.map(b => {
-    return { title: b.title, author: b.author, url: b.url, likes: b.likes }
+    const storedBlogs = await helper.storedBlogs()
+    expect(storedBlogs).toHaveLength(helper.initialBlogs.length + 1)
+    const storedBlogsMin = storedBlogs.map(b => {
+      return { title: b.title, author: b.author, url: b.url, likes: b.likes }
+    })
+    expect(storedBlogsMin).toContainEqual(newBlog)
   })
-  expect(storedBlogsMin).toContainEqual(newBlog)
-})
 
-test('likes is 0 by default', async () => {
-  const newBlog = {
-    title: 'Test blog',
-    author: 'jest',
-    url: 'https://jestjs.io/',
-  }
+  test('sets likes to zero by default', async () => {
+    const newBlog = {
+      title: 'Test blog',
+      author: 'jest',
+      url: 'https://jestjs.io/',
+    }
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
 
-  const storedBlog = await Blog.findOne(newBlog)
-  expect(storedBlog.likes).toBe(0)
+    const storedBlog = await Blog.findOne(newBlog)
+    expect(storedBlog.likes).toBe(0)
 
-})
+  })
 
-test('new blog without a title gets rejected', async () => {
-  const newBlog = {
-    author: 'jest',
-    url: 'https://jestjs.io/',
-    likes: 12,
-  }
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(400)
+  test('without a title is rejected with status code 400', async () => {
+    const newBlog = {
+      author: 'jest',
+      url: 'https://jestjs.io/',
+      likes: 12,
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
 
-  const storedBlogs = await helper.storedBlogs()
-  expect(storedBlogs).toHaveLength(helper.initialBlogs.length)
-})
+    const storedBlogs = await helper.storedBlogs()
+    expect(storedBlogs).toHaveLength(helper.initialBlogs.length)
+  })
 
-test('new blog without a url gets rejected', async () => {
-  const newBlog = {
-    title: 'Test blog',
-    author: 'jest',
-    likes: 12,
-  }
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(400)
+  test('without a url is rejected with status code 400', async () => {
+    const newBlog = {
+      title: 'Test blog',
+      author: 'jest',
+      likes: 12,
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
 
-  const storedBlogs = await helper.storedBlogs()
-  expect(storedBlogs).toHaveLength(helper.initialBlogs.length)
+    const storedBlogs = await helper.storedBlogs()
+    expect(storedBlogs).toHaveLength(helper.initialBlogs.length)
+  })
 })
 
 afterAll(() => {
