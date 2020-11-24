@@ -3,6 +3,7 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const { initialBlogs } = require('./test_helper')
 const helper = require('./test_helper')
 
 beforeEach(async () => {
@@ -131,6 +132,49 @@ describe('deleting a blog', () => {
       .expect(400)
     const storedAfter = await helper.storedBlogs()
     expect(storedAfter).toHaveLength(helper.initialBlogs.length)
+  })
+})
+
+describe('updating a blog', () => {
+  test('succeeds with valid data', async () => {
+    const blogsBefore = await helper.storedBlogs()
+    const b = blogsBefore[0]
+    const body = {
+      title: b.title,
+      author: b.author,
+      url: b.url,
+      likes: b.likes + 1
+    }
+    await api
+      .put(`/api/blogs/${b.id}`)
+      .send(body)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsAfter = await helper.storedBlogs()
+    expect(blogsAfter.find(blog => blog.id === b.id).likes).toBe(body.likes)
+  })
+
+  test('if id does not exist returns status code 404', async () => {
+    const blogToUpdate = { ...helper.initialBlogs[0] }
+    const newLikes = blogToUpdate.likes + 1
+    blogToUpdate.likes = newLikes
+    const nonExistingId = await helper.nonExistingId()
+    await api
+      .put(`/api/blogs/${nonExistingId}`)
+      .send(blogToUpdate)
+      .expect(404)
+  })
+
+  test('if id is invalid returns status code 400', async () => {
+    const blogToUpdate = { ...helper.initialBlogs[0] }
+    const newLikes = blogToUpdate.likes + 1
+    blogToUpdate.likes = newLikes
+    const invalidId = '12345'
+    await api
+      .put(`/api/blogs/${invalidId}`)
+      .send(blogToUpdate)
+      .expect(400)
   })
 })
 
