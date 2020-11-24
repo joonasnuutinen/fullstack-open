@@ -68,6 +68,36 @@ test('likes is 0 by default', async () => {
 
 })
 
+test('new blog without a title gets rejected', async () => {
+  const newBlog = {
+    author: 'jest',
+    url: 'https://jestjs.io/',
+    likes: 12,
+  }
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+  const storedBlogs = await helper.storedBlogs()
+  expect(storedBlogs).toHaveLength(helper.initialBlogs.length)
+})
+
+test('new blog without a url gets rejected', async () => {
+  const newBlog = {
+    title: 'Test blog',
+    author: 'jest',
+    likes: 12,
+  }
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+  const storedBlogs = await helper.storedBlogs()
+  expect(storedBlogs).toHaveLength(helper.initialBlogs.length)
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
