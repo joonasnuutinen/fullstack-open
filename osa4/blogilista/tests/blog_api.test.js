@@ -3,24 +3,11 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
-const initialBlogs = [
-  {
-    title: 'First blog',
-    author: 'Joonas',
-    url: 'https://autua.fi',
-    likes: 15,
-  },
-  {
-    title: 'Second blog',
-    author: 'Matti',
-    url: 'https://fullstackopen.com/osa4/backendin_testaaminen',
-    likes: 300,
-  }
-]
+const helper = require('./test_helper')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  await Blog.insertMany(initialBlogs)
+  await Blog.insertMany(helper.initialBlogs)
 })
 
 test('notes are returned as json', async () => {
@@ -32,7 +19,7 @@ test('notes are returned as json', async () => {
 
 test('all notes are returned', async () => {
   const response = await api.get('/api/blogs')
-  expect(response.body).toHaveLength(initialBlogs.length)
+  expect(response.body).toHaveLength(helper.initialBlogs.length)
 })
 
 test('identifying field is named "id"', async () => {
@@ -41,6 +28,28 @@ test('identifying field is named "id"', async () => {
     expect(blog.id).toBeDefined()
     expect(blog._id).not.toBeDefined()
   })
+})
+
+test('new blog can be added', async () => {
+  const newBlog = {
+    title: 'Test blog',
+    author: 'jest',
+    url: 'https://jestjs.io/',
+    likes: 12,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const storedBlogs = await helper.storedBlogs()
+  expect(storedBlogs).toHaveLength(helper.initialBlogs.length + 1)
+  const storedBlogsMin = storedBlogs.map(b => {
+    return { title: b.title, author: b.author, url: b.url, likes: b.likes }
+  })
+  expect(storedBlogsMin).toContainEqual(newBlog)
 })
 
 afterAll(() => {
