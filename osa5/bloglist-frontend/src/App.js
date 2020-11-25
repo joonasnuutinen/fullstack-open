@@ -1,24 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
-import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
+import { TextInput, PasswordInput } from './components/Input'
 import blogService from './services/blogs'
 import loginService from './services/login'
-
-const Input = ({ label, type, value, name, setValue }) => (
-  <div>
-    {label}
-    <input
-      type={type}
-      value={value}
-      name={name}
-      onChange={({ target }) => setValue(target.value)}
-    />
-  </div>
-)
-
-const TextInput = (props) => Input({ ...props, type: 'text' })
-
-const PasswordInput = props => Input({ ...props, type: 'password' })
 
 const LoginForm = ({ username, setUsername, password, setPassword, onSubmit }) => (
   <form onSubmit={onSubmit}>
@@ -27,41 +12,6 @@ const LoginForm = ({ username, setUsername, password, setPassword, onSubmit }) =
     <button type="submit">login</button>
   </form>
 )
-
-const NewBlogForm = ({ onSuccess, onError }) => {
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
-
-  const handleSubmit = async event => {
-    event.preventDefault()
-    const newBlog = { title, author, url }
-
-    try {
-      const storedBlog = await blogService.create(newBlog)
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-      togglableRef.current.toggleVisibility()
-      onSuccess(storedBlog)
-    } catch (exception) {
-      onError(exception)
-    }
-  }
-
-  const togglableRef = useRef()
-
-  return (
-    <Togglable buttonLabel="new note" ref={togglableRef}>
-      <form onSubmit={handleSubmit}>
-        <TextInput label="title" value={title} name="title" setValue={setTitle} />
-        <TextInput label="author" value={author} name="author" setValue={setAuthor} />
-        <TextInput label="url" value={url} name="url" setValue={setUrl} />
-        <button type="submit">create</button>
-      </form>
-    </Togglable>
-  )
-}
 
 const BlogList = ({ blogs }) => (
   <div>
@@ -95,7 +45,6 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [message, setMessage] = useState(null)
-  
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -180,7 +129,7 @@ const App = () => {
           </p>
 
           <h2>create new</h2>
-          <NewBlogForm onSuccess={addToBlogs} onError={onAddBlogError} />
+          <BlogForm onSuccess={addToBlogs} onError={onAddBlogError} />
           <BlogList blogs={blogs} />
         </>
       }
