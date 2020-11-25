@@ -27,7 +27,7 @@ const LoginForm = ({ username, setUsername, password, setPassword, onSubmit }) =
   </form>
 )
 
-const NewBlogForm = ({ afterSubmit }) => {
+const NewBlogForm = ({ onSuccess, onError }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
@@ -35,11 +35,16 @@ const NewBlogForm = ({ afterSubmit }) => {
   const handleSubmit = async event => {
     event.preventDefault()
     const newBlog = { title, author, url }
-    const storedBlog = await blogService.create(newBlog)
-    setTitle('')
-    setAuthor('')
-    setUrl('')
-    afterSubmit(storedBlog)
+
+    try {
+      const storedBlog = await blogService.create(newBlog)
+      setTitle('')
+      setAuthor('')
+      setUrl('')
+      onSuccess(storedBlog)
+    } catch (exception) {
+      onError(exception)
+    }
   }
 
   return (
@@ -60,14 +65,30 @@ const BlogList = ({ blogs }) => (
   </div>
 )
 
-const ErrorMessage = ({ msg }) => msg && <div>{msg}</div>
+const ErrorMessage = ({ message }) => {
+  if (!message) return null
+  
+  const colors = { success: 'green', error: 'red', default: 'blue' }
+  const type = message.type || 'default'
+  const style = {
+    padding: 10,
+    color: colors[type],
+    borderStyle: 'solid',
+    background: 'lightgray',
+  }
+  return (
+    <div style={style}>
+      {message.content}
+    </div>
+  )
+}
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [message, setMessage] = useState(null)
   
 
   useEffect(() => {
@@ -101,10 +122,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setErrorMessage('wrong credentials')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      msg.error('wrong credentials')
     }
   }
 
@@ -115,11 +133,28 @@ const App = () => {
 
   const addToBlogs = storedBlog => {
     setBlogs(blogs.concat(storedBlog))
+    msg.success(`a new blog ${storedBlog.title} by ${storedBlog.author} added`)
+  }
+
+  const onAddBlogError = exception => {
+    msg.error('Adding new blog failed')
+  }
+
+  const showMessage = (content, type) => {
+    setMessage({ content, type })
+    setTimeout(() => {
+      setMessage(null)
+    }, 5000)
+  }
+
+  const msg = {
+    success: message => showMessage(message, 'success'),
+    error: message => showMessage(message, 'error')
   }
 
   return (
     <div>
-      <ErrorMessage msg={errorMessage} />
+      <ErrorMessage message={message} />
       {user === null ?
         <>
           <h2>log in to application</h2>
@@ -139,7 +174,7 @@ const App = () => {
           </p>
 
           <h2>create new</h2>
-          <NewBlogForm afterSubmit={addToBlogs} />
+          <NewBlogForm onSuccess={addToBlogs} onError={onAddBlogError} />
           <BlogList blogs={blogs} />
         </>
       }
