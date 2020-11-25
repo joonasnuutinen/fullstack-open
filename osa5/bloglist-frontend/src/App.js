@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -41,19 +42,24 @@ const NewBlogForm = ({ onSuccess, onError }) => {
       setTitle('')
       setAuthor('')
       setUrl('')
+      togglableRef.current.toggleVisibility()
       onSuccess(storedBlog)
     } catch (exception) {
       onError(exception)
     }
   }
 
+  const togglableRef = useRef()
+
   return (
-    <form onSubmit={handleSubmit}>
-      <TextInput label="title" value={title} name="title" setValue={setTitle} />
-      <TextInput label="author" value={author} name="author" setValue={setAuthor} />
-      <TextInput label="url" value={url} name="url" setValue={setUrl} />
-      <button type="submit">create</button>
-    </form>
+    <Togglable buttonLabel="new note" ref={togglableRef}>
+      <form onSubmit={handleSubmit}>
+        <TextInput label="title" value={title} name="title" setValue={setTitle} />
+        <TextInput label="author" value={author} name="author" setValue={setAuthor} />
+        <TextInput label="url" value={url} name="url" setValue={setUrl} />
+        <button type="submit">create</button>
+      </form>
+    </Togglable>
   )
 }
 
