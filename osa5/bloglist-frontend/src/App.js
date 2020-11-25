@@ -27,6 +27,31 @@ const LoginForm = ({ username, setUsername, password, setPassword, onSubmit }) =
   </form>
 )
 
+const NewBlogForm = ({ afterSubmit }) => {
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
+
+  const handleSubmit = async event => {
+    event.preventDefault()
+    const newBlog = { title, author, url }
+    const storedBlog = await blogService.create(newBlog)
+    setTitle('')
+    setAuthor('')
+    setUrl('')
+    afterSubmit(storedBlog)
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <TextInput label="title" value={title} name="title" setValue={setTitle} />
+      <TextInput label="author" value={author} name="author" setValue={setAuthor} />
+      <TextInput label="url" value={url} name="url" setValue={setUrl} />
+      <button type="submit">create</button>
+    </form>
+  )
+}
+
 const BlogList = ({ blogs }) => (
   <div>
     {blogs.map(blog =>
@@ -43,6 +68,7 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
+  
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -56,6 +82,7 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem(userStorageKey)
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
+      blogService.setToken(user.token)
       setUser(user)
     }
   }, [])
@@ -68,6 +95,8 @@ const App = () => {
       window.localStorage.setItem(
         userStorageKey, JSON.stringify(user)
       )
+      
+      blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
@@ -82,6 +111,10 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem(userStorageKey)
     setUser(null)
+  }
+
+  const addToBlogs = storedBlog => {
+    setBlogs(blogs.concat(storedBlog))
   }
 
   return (
@@ -104,6 +137,9 @@ const App = () => {
             {user.name} logged in
             <button onClick={handleLogout}>logout</button>
           </p>
+
+          <h2>create new</h2>
+          <NewBlogForm afterSubmit={addToBlogs} />
           <BlogList blogs={blogs} />
         </>
       }
