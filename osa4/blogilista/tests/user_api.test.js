@@ -1,10 +1,13 @@
+require('dotenv').config()
+const helper = require('./test_helper')
+helper.setMongoTestURISuffix('user_api')
+
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const bcrypt = require('bcrypt')
 const app = require('../app')
 const api = supertest(app)
 const User = require('../models/user')
-const helper = require('./test_helper')
 
 describe('creating a user', () => {
   const initialUsername = 'root'

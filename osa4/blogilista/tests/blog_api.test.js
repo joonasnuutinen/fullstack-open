@@ -1,16 +1,23 @@
+require('dotenv').config()
+const helper = require('./test_helper')
+helper.setMongoTestURISuffix('blog_api')
+
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 const app = require('../app')
+
 const api = supertest(app)
 const Blog = require('../models/blog')
-const helper = require('./test_helper')
-
-beforeEach(async () => {
-  await Blog.deleteMany({})
-  await Blog.insertMany(helper.initialBlogs)
-})
+const User = require('../models/user')
 
 describe('when getting blogs', () => {
+  beforeEach(async () => {
+    await Blog.deleteMany({})
+    await Blog.insertMany(helper.initialBlogs)
+  })
+
   test('blogs are returned as json', async () => {
     await api
       .get('/api/blogs')
@@ -33,6 +40,23 @@ describe('when getting blogs', () => {
 })
 
 describe('adding a new blog', () => {
+  let auth
+  beforeEach(async () => {
+    await User.deleteMany({})
+    await Blog.deleteMany({})
+
+    // Add a user
+    const passwordHash = await bcrypt.hash('notstrong', 10)
+    const user = new User({ username: 'blogger', passwordHash })
+    const token = jwt.sign({ username: user.username, id: user._id }, process.env.SECRET)
+    auth = `bearer ${token}`
+    await user.save()
+
+    // Add initial blogs
+    helper.initialBlogs.forEach(b => b.user = user._id)
+    await Blog.insertMany(helper.initialBlogs)
+  })
+
   test('succeeds with valid data', async () => {
     const newBlog = {
       title: 'Test blog',
@@ -43,6 +67,7 @@ describe('adding a new blog', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', auth)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -64,7 +89,10 @@ describe('adding a new blog', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', auth)
       .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
 
     const storedBlog = await Blog.findOne(newBlog)
     expect(storedBlog.likes).toBe(0)
@@ -79,6 +107,7 @@ describe('adding a new blog', () => {
     }
     await api
       .post('/api/blogs')
+      .set('Authorization', auth)
       .send(newBlog)
       .expect(400)
 
@@ -94,20 +123,57 @@ describe('adding a new blog', () => {
     }
     await api
       .post('/api/blogs')
+      .set('Authorization', auth)
       .send(newBlog)
       .expect(400)
 
     const storedBlogs = await helper.storedBlogs()
     expect(storedBlogs).toHaveLength(helper.initialBlogs.length)
   })
+
+  test('fails without a token', async () => {
+    const newBlog = {
+      title: 'Test blog',
+      author: 'jest',
+      url: 'https://jestjs.io/',
+      likes: 12,
+    }
+
+    const result = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toContain('token')
+    const storedBlogs = await helper.storedBlogs()
+    expect(storedBlogs).toHaveLength(helper.initialBlogs.length)
+  })
 })
 
 describe('deleting a blog', () => {
+  let auth
+  beforeEach(async () => {
+    await User.deleteMany({})
+    await Blog.deleteMany({})
+
+    // Add a user
+    const passwordHash = await bcrypt.hash('notstrong', 10)
+    const user = new User({ username: 'blogger', passwordHash })
+    const token = jwt.sign({ username: user.username, id: user._id }, process.env.SECRET)
+    auth = `bearer ${token}`
+    await user.save()
+
+    // Add initial blogs
+    helper.initialBlogs.forEach(b => b.user = user._id)
+    await Blog.insertMany(helper.initialBlogs)
+  })
   test('succeeds with a valid id', async () => {
     const storedBlogs = await helper.storedBlogs()
     const blogToDelete = storedBlogs[0]
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', auth)
       .expect(204)
 
     const storedBlogsAfterDeletion = await helper.storedBlogs()
@@ -119,6 +185,7 @@ describe('deleting a blog', () => {
     const nonExistingId = await helper.nonExistingId()
     await api
       .delete(`/api/blogs/${nonExistingId}`)
+      .set('Authorization', auth)
       .expect(204)
     const storedAfter = await helper.storedBlogs()
     expect(storedAfter).toHaveLength(helper.initialBlogs.length)
@@ -128,6 +195,7 @@ describe('deleting a blog', () => {
     const invalidId = '12345'
     await api
       .delete(`/api/blogs/${invalidId}`)
+      .set('Authorization', auth)
       .expect(400)
     const storedAfter = await helper.storedBlogs()
     expect(storedAfter).toHaveLength(helper.initialBlogs.length)

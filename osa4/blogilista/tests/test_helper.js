@@ -33,9 +33,24 @@ const nonExistingId = async () => {
   return blog._id.toString()
 }
 
+/**
+ * Add a suffix to the test database URI to avoid synchronization issues between
+ * test suites.
+ *
+ * @param {String} sfx The suffix that identifies the test suite
+ */
+const setMongoTestURISuffix = (sfx) => {
+  const uri = process.env.TEST_MONGODB_URI
+  const sep = '?'
+  const parts = uri.split(sep)
+  parts[0] += `-${sfx}`
+  process.env.TEST_MONGODB_URI = parts.join(sep)
+}
+
 module.exports = {
   initialBlogs,
   storedBlogs,
   storedUsers,
   nonExistingId,
+  setMongoTestURISuffix,
 }
