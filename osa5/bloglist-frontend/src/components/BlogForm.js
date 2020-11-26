@@ -3,14 +3,20 @@ import Togglable from './Togglable'
 import { TextInput } from './Input'
 import blogService from '../services/blogs'
 
-const BlogForm = ({ onSuccess, onError }) => {
+const BlogForm = ({ onSuccess, onError, testCb }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
 
   const handleSubmit = async event => {
     event.preventDefault()
+
     const newBlog = { title, author, url }
+
+    // For testing in ex. 5.16
+    if (testCb) {
+      testCb(newBlog)
+    }
 
     try {
       const storedBlog = await blogService.create(newBlog)
