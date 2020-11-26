@@ -13,10 +13,10 @@ const LoginForm = ({ username, setUsername, password, setPassword, onSubmit }) =
   </form>
 )
 
-const BlogList = ({ blogs }) => (
+const BlogList = ({ blogs, handleLike }) => (
   <div>
     {blogs.map(blog =>
-      <Blog key={blog.id} blog={blog} />
+      <Blog key={blog.id} blog={blog} handleLike={handleLike} />
     )}
   </div>
 )
@@ -86,6 +86,16 @@ const App = () => {
     setUser(null)
   }
 
+  const handleLike = async ({ title, author, url, likes, user, id }) => {
+    const updatedBlog = await blogService.update(id, {
+      title, author, url, likes: likes + 1, user: user?.id
+    })
+    setBlogs(blogs.map(
+      // Update only likes to keep user data populated
+      b => b.id === updatedBlog.id ? { ...b, likes: updatedBlog.likes } : b
+    ))
+  }
+
   const addToBlogs = storedBlog => {
     setBlogs(blogs.concat(storedBlog))
     msg.success(`a new blog ${storedBlog.title} by ${storedBlog.author} added`)
@@ -130,7 +140,7 @@ const App = () => {
 
           <h2>create new</h2>
           <BlogForm onSuccess={addToBlogs} onError={onAddBlogError} />
-          <BlogList blogs={blogs} />
+          <BlogList blogs={blogs} handleLike={handleLike} />
         </>
       }
     </div>
