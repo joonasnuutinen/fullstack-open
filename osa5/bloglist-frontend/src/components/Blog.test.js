@@ -1,23 +1,37 @@
 import React from 'react'
 import '@testing-library/jest-dom/extend-expect'
-import { render } from '@testing-library/react'
+import { render, fireEvent } from '@testing-library/react'
 import Blog from './Blog'
 
-test('only title and author are rendered by default', () => {
+describe('<Blog /> component renders', () => {
   const blog = {
     title: 'test blog',
     author: 'test author',
     url: 'https://localhost:3000',
     likes: 100,
   }
+  let component
 
-  const component = render(
-    <Blog blog={blog} />
-  )
+  beforeEach(() => {
+    component = render(
+      <Blog blog={blog} />
+    )
+  })
 
-  //component.debug()
-  expect(component.container).toHaveTextContent(blog.title)
-  expect(component.container).toHaveTextContent(blog.author)
-  expect(component.container).not.toHaveTextContent(blog.url)
-  expect(component.container).not.toHaveTextContent(blog.likes)
+  test('only title and author by default', () => {
+    expect(component.container).toHaveTextContent(blog.title)
+    expect(component.container).toHaveTextContent(blog.author)
+    expect(component.container).not.toHaveTextContent(blog.url)
+    expect(component.container).not.toHaveTextContent(blog.likes)
+  })
+
+  test('after clicking the button, also url and likes', () => {
+    const button = component.getByText('view')
+    fireEvent.click(button)
+
+    expect(component.container).toHaveTextContent(blog.title)
+    expect(component.container).toHaveTextContent(blog.author)
+    expect(component.container).toHaveTextContent(blog.url)
+    expect(component.container).toHaveTextContent(blog.likes)
+  })
 })
