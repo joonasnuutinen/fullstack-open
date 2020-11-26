@@ -27,7 +27,7 @@ const Blog = ({ blog, handleLike, handleDelete, user }) => {
           </div>
           {blog.user &&
             <>
-              <div>{blog.user?.name}</div>
+              <div>{blog.user && blog.user.name}</div>
               {blog.user.username === user.username &&
                 <button
                   style={{ background: 'red', color: 'white' }}

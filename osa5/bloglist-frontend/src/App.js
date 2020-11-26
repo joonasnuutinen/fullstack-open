@@ -32,7 +32,7 @@ const BlogList = ({ blogs, handleLike, handleDelete, user }) => {
 
 const ErrorMessage = ({ message }) => {
   if (!message) return null
-  
+
   const colors = { success: 'green', error: 'red', default: 'blue' }
   const type = message.type || 'default'
   const style = {
@@ -58,7 +58,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   const userStorageKey = 'loggedBlogAppUser'
@@ -74,13 +74,13 @@ const App = () => {
 
   const handleLogin = async event => {
     event.preventDefault()
-    
+
     try {
       const user = await loginService.login({ username, password })
       window.localStorage.setItem(
         userStorageKey, JSON.stringify(user)
       )
-      
+
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
@@ -97,7 +97,7 @@ const App = () => {
 
   const handleLike = async ({ title, author, url, likes, user, id }) => {
     const updatedBlog = await blogService.update(id, {
-      title, author, url, likes: likes + 1, user: user?.id
+      title, author, url, likes: likes + 1, user: user && user.id
     })
     setBlogs(blogs.map(
       // Update only likes to keep user data populated
@@ -122,7 +122,7 @@ const App = () => {
     msg.success(`a new blog ${storedBlog.title} by ${storedBlog.author} added`)
   }
 
-  const onAddBlogError = exception => {
+  const onAddBlogError = () => {
     msg.error('Adding new blog failed')
   }
 
