@@ -13,12 +13,18 @@ const LoginForm = ({ username, setUsername, password, setPassword, onSubmit }) =
   </form>
 )
 
-const BlogList = ({ blogs, handleLike }) => {
+const BlogList = ({ blogs, handleLike, handleDelete, user }) => {
   const sortedBlogs = blogs.sort((b1, b2) => b2.likes - b1.likes)
   return (
     <div>
       {sortedBlogs.map(blog =>
-        <Blog key={blog.id} blog={blog} handleLike={handleLike} />
+        <Blog
+          key={blog.id}
+          blog={blog}
+          handleLike={handleLike}
+          handleDelete={handleDelete}
+          user={user}
+        />
       )}
     </div>
   )
@@ -99,6 +105,18 @@ const App = () => {
     ))
   }
 
+  const handleDelete = async (blog) => {
+    const blogInfo = `${blog.title} by ${blog.author}`
+    if (!window.confirm(`Remove blog ${blogInfo}`)) return
+    try {
+      await blogService.remove(blog.id)
+      setBlogs(blogs.filter(b => b.id !== blog.id))
+      msg.success(`Successfully removed ${blogInfo}`)
+    } catch (exception) {
+      msg.error('An error occurred when attempting to remove the blog')
+    }
+  }
+
   const addToBlogs = storedBlog => {
     setBlogs(blogs.concat(storedBlog))
     msg.success(`a new blog ${storedBlog.title} by ${storedBlog.author} added`)
@@ -143,7 +161,12 @@ const App = () => {
 
           <h2>create new</h2>
           <BlogForm onSuccess={addToBlogs} onError={onAddBlogError} />
-          <BlogList blogs={blogs} handleLike={handleLike} />
+          <BlogList
+            blogs={blogs}
+            handleLike={handleLike}
+            handleDelete={handleDelete}
+            user={user}
+          />
         </>
       }
     </div>
