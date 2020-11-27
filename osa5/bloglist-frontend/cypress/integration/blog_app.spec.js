@@ -31,4 +31,25 @@ describe('Blog app', function() {
       cy.contains('wrong credentials').should('have.css', 'color', 'rgb(255, 0, 0)')
     })
   })
+
+  describe.only('When logged in', function() {
+    beforeEach(function() {
+      cy.login('joonas', 'jonttuli')
+    })
+
+    it('A blog can be created', function() {
+      cy.contains('new note').click()
+      const b = {
+        title: 'cypress test',
+        author: 'cypress',
+        url: 'https://www.cypress.io'
+      }
+      cy.contains('title').find('input').type(b.title)
+      cy.contains('author').find('input').type(b.author)
+      cy.contains('url').find('input').type(b.url)
+      cy.contains('button', 'create').click()
+      cy.contains(`a new blog ${b.title} by ${b.author} added`)
+      cy.contains(`${b.title} ${b.author}`)
+    })
+  })
 })
