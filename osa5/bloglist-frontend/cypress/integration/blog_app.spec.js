@@ -48,11 +48,18 @@ describe('Blog app', function() {
       cy.contains(`${b.title} ${b.author}`)
     })
 
-    describe('and a blog exists', function() {
-      const likeMe = { title: 'like me', author: 'me', url: 'https://www.cypress.io' }
+    describe('and several blogs exist', function() {
+      const testBlogs = [
+        { title: 'like me', author: 'me', url: 'https://www.cypress.io' },
+        { title: 'another', author: 'you', url: '/another', likes: 10 },
+        { title: 'one more', author: 'them', url: '/one-more', likes: 9 },
+      ]
+      const likeMe = testBlogs[0]
 
       beforeEach(function() {
-        cy.createBlog(likeMe)
+        testBlogs.forEach(blog => {
+          cy.createBlog(blog)
+        })
       })
 
       it('a blog can be liked', function() {
@@ -75,6 +82,19 @@ describe('Blog app', function() {
         cy.login(darth)
         cy.contains(likeMe.title).as('likeMe').contains('view').click()
         cy.get('@likeMe').should('not.contain', 'remove')
+      })
+
+      it('blogs are sorted by likes', function() {
+        cy.contains('blogs')
+        cy.get('#blogs').should($blogs => {
+          expect($blogs.children()).to.have.length(testBlogs.length)
+          const sortedBlogs = testBlogs.sort((b1, b2) => (b2.likes || 0) - (b1.likes || 0))
+          $blogs.children().each((i, blog) => {
+            const content = Cypress.$(blog).text()
+            const compBlog = sortedBlogs[i]
+            expect(content).to.equal(`${compBlog.title} ${compBlog.author}view`)
+          })
+        })
       })
     })
   })

@@ -16,7 +16,7 @@ const LoginForm = ({ username, setUsername, password, setPassword, onSubmit }) =
 const BlogList = ({ blogs, handleLike, handleDelete, user }) => {
   const sortedBlogs = blogs.sort((b1, b2) => b2.likes - b1.likes)
   return (
-    <div>
+    <div id="blogs">
       {sortedBlogs.map(blog =>
         <Blog
           key={blog.id}
