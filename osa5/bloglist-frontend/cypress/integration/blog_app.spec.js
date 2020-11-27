@@ -1,13 +1,9 @@
+const joonas = { name: 'Joonas Nuutinen', username: 'joonas', password: 'jonttuli' }
+
 describe('Blog app', function() {
   beforeEach(function() {
     cy.request('POST', 'http://localhost:3001/api/testing/reset')
-    const user = {
-      name: 'Joonas Nuutinen',
-      username: 'joonas',
-      password: 'jonttuli'
-    }
-    cy.request('POST', 'http://localhost:3001/api/users', user)
-    cy.visit('http://localhost:3000')
+    cy.createUser(joonas)
   })
 
   it('Login form is shown', function() {
@@ -32,9 +28,9 @@ describe('Blog app', function() {
     })
   })
 
-  describe.only('When logged in', function() {
+  describe('When logged in', function() {
     beforeEach(function() {
-      cy.login('joonas', 'jonttuli')
+      cy.login(joonas)
     })
 
     it('A blog can be created', function() {
@@ -53,15 +49,32 @@ describe('Blog app', function() {
     })
 
     describe('and a blog exists', function() {
+      const likeMe = { title: 'like me', author: 'me', url: 'https://www.cypress.io' }
+
       beforeEach(function() {
-        cy.createBlog({ title: 'like me', author: 'me', url: 'https://www.cypress.io' })
+        cy.createBlog(likeMe)
       })
 
       it('a blog can be liked', function() {
-        cy.contains('like me').as('likeMe').contains('view').click()
+        cy.contains(likeMe.title).as('likeMe').contains('view').click()
         cy.get('@likeMe').contains('likes 0')
         cy.get('@likeMe').contains('button', 'like').click()
         cy.get('@likeMe').contains('likes 1')
+      })
+
+      it('blog can be deleted by the user who added it', function() {
+        cy.contains(likeMe.title).as('likeMe').contains('view').click()
+        cy.get('@likeMe').contains('remove').click()
+        cy.contains(`Successfully removed ${likeMe.title} by ${likeMe.author}`)
+        cy.get('html').should('not.contain', likeMe.tite)
+      })
+
+      it('blog cannot be deleted by another user', function() {
+        const darth = { username: 'darth', name: 'Darth Vader', password: 'papa' }
+        cy.createUser(darth)
+        cy.login(darth)
+        cy.contains(likeMe.title).as('likeMe').contains('view').click()
+        cy.get('@likeMe').should('not.contain', 'remove')
       })
     })
   })
