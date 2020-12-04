@@ -7,17 +7,25 @@ const reducer = (state = '', action) => {
   }
 }
 
-export const showNotification = (content) => {
+const showNotification = (content) => {
   return {
     type: 'SET_NOTIFICATION',
     content
   }
 }
 
-export const removeNotification = () => {
+const removeNotification = () => {
   return {
     type: 'SET_NOTIFICATION',
     content: ''
+  }
+}
+
+export const setNotification = (content, duration = 5) => {
+  return async dispatch => {
+    dispatch(showNotification(content))
+    await new Promise(r => setTimeout(r, duration * 1000))
+    dispatch(removeNotification())
   }
 }
 

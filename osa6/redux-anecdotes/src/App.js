@@ -5,7 +5,6 @@ import Notification from './components/Notification'
 import Filter from './components/Filter'
 import { useDispatch } from 'react-redux'
 import { initializeAnecdotes } from './reducers/anecdoteReducer'
-import { showNotification, removeNotification } from './reducers/notificationReducer'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -14,21 +13,14 @@ const App = () => {
     dispatch(initializeAnecdotes())
   }, [dispatch])
 
-  const notify = (content) => {
-    dispatch(showNotification(content))
-    setTimeout(() => {
-      dispatch(removeNotification())
-    }, 5000)
-  }
-
   return (
     <div>
       <h2>Anecdotes</h2>
       <Notification />
       <Filter />
-      <AnecdoteList notify={notify} />
+      <AnecdoteList />
       <h2>create new</h2>
-      <AnecdoteForm notify={notify} />
+      <AnecdoteForm />
     </div>
   )
 }
