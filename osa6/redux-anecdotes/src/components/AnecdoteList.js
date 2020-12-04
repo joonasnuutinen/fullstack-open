@@ -24,10 +24,10 @@ const AnecdoteList = ({ notify }) => {
       .sort((a1, a2) => a2.votes - a1.votes)
   )
 
-  const vote = ({ id, content }) => {
-    console.log('vote', id)
-    dispatch(addVote(id))
-    notify(`you voted '${content}'`)
+  const vote = (anecdote) => {
+    //console.log('vote', id)
+    dispatch(addVote(anecdote))
+    notify(`you voted '${anecdote.content}'`)
   }
 
   return (
