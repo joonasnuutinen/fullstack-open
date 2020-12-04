@@ -4,7 +4,7 @@ import { addVote } from '../reducers/anecdoteReducer'
 
 const AnecdoteList = () => {
   const dispatch = useDispatch()
-  const anecdotes = useSelector(state => state.sort((a1, a2) => a2.votes - a1.votes))
+  const anecdotes = useSelector(state => state.anecdotes.sort((a1, a2) => a2.votes - a1.votes))
 
   const vote = (id) => {
     console.log('vote', id)
