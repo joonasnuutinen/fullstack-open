@@ -2,6 +2,7 @@ import React from 'react'
 import AnecdoteForm from './components/AnecdoteForm'
 import AnecdoteList from './components/AnecdoteList'
 import Notification from './components/Notification'
+import Filter from './components/Filter'
 import { useDispatch } from 'react-redux'
 import { showNotification, removeNotification } from './reducers/notificationReducer'
 
@@ -18,8 +19,10 @@ const App = () => {
     <div>
       <h2>Anecdotes</h2>
       <Notification />
-      <AnecdoteForm notify={notify} />
+      <Filter />
       <AnecdoteList notify={notify} />
+      <h2>create new</h2>
+      <AnecdoteForm notify={notify} />
     </div>
   )
 }
