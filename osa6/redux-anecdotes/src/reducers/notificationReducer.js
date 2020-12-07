@@ -21,11 +21,19 @@ const removeNotification = () => {
   }
 }
 
+let notificationID = null
+
 export const setNotification = (content, duration = 5) => {
   return async dispatch => {
     dispatch(showNotification(content))
-    await new Promise(r => setTimeout(r, duration * 1000))
+    await new Promise(r => {
+      if (notificationID) {
+        clearTimeout(notificationID)
+      }
+      notificationID = setTimeout(r, duration * 1000)
+    })
     dispatch(removeNotification())
+    notificationID = null
   }
 }
 
