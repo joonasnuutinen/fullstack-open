@@ -1,32 +1,31 @@
 import React, { useState, useRef } from 'react'
+import { useDispatch } from 'react-redux'
 import Togglable from './Togglable'
 import { TextInput } from './Input'
-import blogService from '../services/blogs'
+import { addBlog } from '../reducers/blogReducer'
+import { notify } from '../reducers/notificationReducer'
 
-const BlogForm = ({ onSuccess, onError, testCb }) => {
+const BlogForm = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+
+  const dispatch = useDispatch()
 
   const handleSubmit = async event => {
     event.preventDefault()
 
     const newBlog = { title, author, url }
 
-    // For testing in ex. 5.16
-    if (testCb) {
-      testCb(newBlog)
-    }
-
     try {
-      const storedBlog = await blogService.create(newBlog)
+      const storedBlog = await dispatch(addBlog(newBlog))
       setTitle('')
       setAuthor('')
       setUrl('')
       togglableRef.current.toggleVisibility()
-      onSuccess(storedBlog)
+      dispatch(notify(`a new blog ${storedBlog.title} by ${storedBlog.author} added`, 'success'))
     } catch (exception) {
-      onError(exception)
+      dispatch(notify('Adding new blog failed', 'error'))
     }
   }
 

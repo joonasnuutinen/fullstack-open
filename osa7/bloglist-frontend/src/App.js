@@ -6,6 +6,7 @@ import { TextInput, PasswordInput } from './components/Input'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import { notify } from './reducers/notificationReducer'
+import { initBlogs } from './reducers/blogReducer'
 
 const LoginForm = ({ username, setUsername, password, setPassword, onSubmit }) => (
   <form onSubmit={onSubmit}>
@@ -15,8 +16,9 @@ const LoginForm = ({ username, setUsername, password, setPassword, onSubmit }) =
   </form>
 )
 
-const BlogList = ({ blogs, handleLike, handleDelete, user }) => {
-  const sortedBlogs = blogs.sort((b1, b2) => b2.likes - b1.likes)
+const BlogList = ({ handleLike, handleDelete, user }) => {
+  const sortedBlogs = useSelector(state => state.blogs.sort((b1, b2) => b2.likes - b1.likes))
+
   return (
     <div id="blogs">
       {sortedBlogs.map(blog =>
@@ -52,7 +54,6 @@ const Notification = () => {
 }
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -60,10 +61,8 @@ const App = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )
-  }, [])
+    dispatch(initBlogs())
+  }, [dispatch])
 
   const userStorageKey = 'loggedBlogAppUser'
 
@@ -99,14 +98,14 @@ const App = () => {
     setUser(null)
   }
 
-  const handleLike = async ({ title, author, url, likes, user, id }) => {
-    const updatedBlog = await blogService.update(id, {
+  const handleLike = async (/*{ title, author, url, likes, user, id }*/) => {
+    /*const updatedBlog = await blogService.update(id, {
       title, author, url, likes: likes + 1, user: user && user.id
     })
     setBlogs(blogs.map(
       // Update only likes to keep user data populated
       b => b.id === updatedBlog.id ? { ...b, likes: updatedBlog.likes } : b
-    ))
+    ))*/
   }
 
   const handleDelete = async (blog) => {
@@ -114,20 +113,11 @@ const App = () => {
     if (!window.confirm(`Remove blog ${blogInfo}`)) return
     try {
       await blogService.remove(blog.id)
-      setBlogs(blogs.filter(b => b.id !== blog.id))
+      //setBlogs(blogs.filter(b => b.id !== blog.id))
       msg.success(`Successfully removed ${blogInfo}`)
     } catch (exception) {
       msg.error('An error occurred when attempting to remove the blog')
     }
-  }
-
-  const addToBlogs = storedBlog => {
-    setBlogs(blogs.concat(storedBlog))
-    msg.success(`a new blog ${storedBlog.title} by ${storedBlog.author} added`)
-  }
-
-  const onAddBlogError = () => {
-    msg.error('Adding new blog failed')
   }
 
   const msg = {
@@ -157,9 +147,8 @@ const App = () => {
           </p>
 
           <h2>create new</h2>
-          <BlogForm onSuccess={addToBlogs} onError={onAddBlogError} />
+          <BlogForm />
           <BlogList
-            blogs={blogs}
             handleLike={handleLike}
             handleDelete={handleDelete}
             user={user}
