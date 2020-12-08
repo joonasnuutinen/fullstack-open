@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import { TextInput, PasswordInput } from './components/Input'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import { notify } from './reducers/notificationReducer'
 
 const LoginForm = ({ username, setUsername, password, setPassword, onSubmit }) => (
   <form onSubmit={onSubmit}>
@@ -30,7 +32,8 @@ const BlogList = ({ blogs, handleLike, handleDelete, user }) => {
   )
 }
 
-const ErrorMessage = ({ message }) => {
+const Notification = () => {
+  const message = useSelector((state => state.notification))
   if (!message) return null
 
   const colors = { success: 'green', error: 'red', default: 'blue' }
@@ -53,7 +56,8 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [message, setMessage] = useState(null)
+
+  const dispatch = useDispatch()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -126,21 +130,14 @@ const App = () => {
     msg.error('Adding new blog failed')
   }
 
-  const showMessage = (content, type) => {
-    setMessage({ content, type })
-    setTimeout(() => {
-      setMessage(null)
-    }, 5000)
-  }
-
   const msg = {
-    success: message => showMessage(message, 'success'),
-    error: message => showMessage(message, 'error')
+    success: message => dispatch(notify(message, 'success')),
+    error: message => dispatch(notify(message, 'error'))
   }
 
   return (
     <div>
-      <ErrorMessage message={message} />
+      <Notification />
       {user === null ?
         <>
           <h2>log in to application</h2>

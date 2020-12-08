@@ -33,7 +33,7 @@ const BlogForm = ({ onSuccess, onError, testCb }) => {
   const togglableRef = useRef()
 
   return (
-    <Togglable buttonLabel="new note" ref={togglableRef}>
+    <Togglable buttonLabel="new blog" ref={togglableRef}>
       <form onSubmit={handleSubmit}>
         <TextInput label="title" value={title} name="title" setValue={setTitle} />
         <TextInput label="author" value={author} name="author" setValue={setAuthor} />
