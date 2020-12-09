@@ -1,7 +1,27 @@
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { likeBlog, removeBlog } from '../reducers/blogReducer'
+import { notify } from '../reducers/notificationReducer'
 
-const Blog = ({ blog, handleLike, handleDelete, user }) => {
+const Blog = ({ blog, user }) => {
   const [showAll, setShowAll] = useState(false)
+
+  const dispatch = useDispatch()
+
+  const handleLike = () => {
+    dispatch(likeBlog(blog))
+  }
+
+  const handleDelete = async () => {
+    const blogInfo = `${blog.title} by ${blog.author}`
+    if (!window.confirm(`Remove blog ${blogInfo}`)) return
+    try {
+      await dispatch(removeBlog(blog.id))
+      dispatch(notify(`Successfully removed ${blogInfo}`, 'success'))
+    } catch (exception) {
+      dispatch(notify('An error occurred when attempting to remove the blog', 'error'))
+    }
+  }
 
   const toggleShowAll = () => setShowAll(!showAll)
   const buttonText = showAll ? 'hide' : 'view'

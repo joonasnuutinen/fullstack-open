@@ -20,8 +20,8 @@ const create = async newBlog => {
   return response.data
 }
 
-const update = async (id, updatedBlog) => {
-  const response = await axios.put(`${baseUrl}/${id}`, updatedBlog)
+const update = async (updatedBlog) => {
+  const response = await axios.put(`${baseUrl}/${updatedBlog.id}`, updatedBlog)
   return response.data
 }
 

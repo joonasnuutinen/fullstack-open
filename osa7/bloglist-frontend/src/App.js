@@ -16,7 +16,7 @@ const LoginForm = ({ username, setUsername, password, setPassword, onSubmit }) =
   </form>
 )
 
-const BlogList = ({ handleLike, handleDelete, user }) => {
+const BlogList = ({ handleDelete, user }) => {
   const sortedBlogs = useSelector(state => state.blogs.sort((b1, b2) => b2.likes - b1.likes))
 
   return (
@@ -25,7 +25,6 @@ const BlogList = ({ handleLike, handleDelete, user }) => {
         <Blog
           key={blog.id}
           blog={blog}
-          handleLike={handleLike}
           handleDelete={handleDelete}
           user={user}
         />
@@ -98,28 +97,6 @@ const App = () => {
     setUser(null)
   }
 
-  const handleLike = async (/*{ title, author, url, likes, user, id }*/) => {
-    /*const updatedBlog = await blogService.update(id, {
-      title, author, url, likes: likes + 1, user: user && user.id
-    })
-    setBlogs(blogs.map(
-      // Update only likes to keep user data populated
-      b => b.id === updatedBlog.id ? { ...b, likes: updatedBlog.likes } : b
-    ))*/
-  }
-
-  const handleDelete = async (blog) => {
-    const blogInfo = `${blog.title} by ${blog.author}`
-    if (!window.confirm(`Remove blog ${blogInfo}`)) return
-    try {
-      await blogService.remove(blog.id)
-      //setBlogs(blogs.filter(b => b.id !== blog.id))
-      msg.success(`Successfully removed ${blogInfo}`)
-    } catch (exception) {
-      msg.error('An error occurred when attempting to remove the blog')
-    }
-  }
-
   const msg = {
     success: message => dispatch(notify(message, 'success')),
     error: message => dispatch(notify(message, 'error'))
@@ -149,8 +126,6 @@ const App = () => {
           <h2>create new</h2>
           <BlogForm />
           <BlogList
-            handleLike={handleLike}
-            handleDelete={handleDelete}
             user={user}
           />
         </>
