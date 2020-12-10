@@ -4,6 +4,19 @@ import { useParams } from 'react-router-dom'
 import { likeBlog, removeBlog } from '../reducers/blogReducer'
 import { notify } from '../reducers/notificationReducer'
 
+const Comments = ({ comments }) => {
+  console.log(comments, comments.map)
+  if (comments.length === 0) {
+    return <p>No comments</p>
+  }
+
+  return (
+    <ul>
+      {comments.map(c => <li key={c}>{c}</li>)}
+    </ul>
+  )
+}
+
 const Blog = () => {
   const dispatch = useDispatch()
 
@@ -48,6 +61,9 @@ const Blog = () => {
           remove
         </button>
       }
+
+      <h3>comments</h3>
+      <Comments comments={blog.comments} />
     </div>
   )
 }
