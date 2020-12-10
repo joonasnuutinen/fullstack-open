@@ -1,11 +1,10 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
-import { likeBlog, removeBlog } from '../reducers/blogReducer'
+import { likeBlog, removeBlog, addComment } from '../reducers/blogReducer'
 import { notify } from '../reducers/notificationReducer'
 
 const Comments = ({ comments }) => {
-  console.log(comments, comments.map)
   if (comments.length === 0) {
     return <p>No comments</p>
   }
@@ -17,6 +16,15 @@ const Comments = ({ comments }) => {
   )
 }
 
+const CommentForm = ({ onSubmit }) => {
+  return (
+    <form onSubmit={onSubmit}>
+      <input name="comment" />
+      <button type="submit">add comment</button>
+    </form>
+  )
+}
+
 const Blog = () => {
   const dispatch = useDispatch()
 
@@ -25,7 +33,6 @@ const Blog = () => {
   const blog = blogs.find(b => b.id === id)
 
   if (!blog) return null
-  console.log(blog)
 
   const handleLike = () => {
     dispatch(likeBlog(blog))
@@ -40,6 +47,11 @@ const Blog = () => {
     } catch (exception) {
       dispatch(notify('An error occurred when attempting to remove the blog', 'error'))
     }
+  }
+
+  const handleAddComment = (e) => {
+    e.preventDefault()
+    dispatch(addComment(blog.id, e.target.comment.value))
   }
 
   return (
@@ -63,6 +75,7 @@ const Blog = () => {
       }
 
       <h3>comments</h3>
+      <CommentForm onSubmit={handleAddComment} />
       <Comments comments={blog.comments} />
     </div>
   )
