@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Switch, Route } from 'react-router-dom'
+import { Switch, Route, Link } from 'react-router-dom'
 import BlogList from './components/BlogList'
 import Blog from './components/Blog'
 import Login from './components/Login'
@@ -28,12 +28,23 @@ const Notification = () => {
   )
 }
 
-const LoggedInStatusBar = ({ user, handleLogout }) => (
-  <p>
-    {user.name} logged in
-    <button onClick={handleLogout}>logout</button>
-  </p>
-)
+const NavBar = ({ user, handleLogout }) => {
+  const navStyle = {
+    background: 'lightgray',
+    padding: 5
+  }
+  const linkStyle = {
+    padding: 3
+  }
+
+  return (
+    <nav style={navStyle}>
+      <Link style={linkStyle} to='/'>blogs</Link>
+      <Link style={linkStyle} to='/users'>users</Link>
+      {user.name} logged in <button onClick={handleLogout}>logout</button>
+    </nav>
+  )
+}
 
 const App = () => {
   const dispatch = useDispatch()
@@ -58,8 +69,8 @@ const App = () => {
         <Login />
         :
         <div>
-          <h2>blogs</h2>
-          <LoggedInStatusBar user={user} handleLogout={handleLogout} />
+          <h2>blog app</h2>
+          <NavBar user={user} handleLogout={handleLogout} />
 
           <Switch>
             <Route path='/users/:id'>
