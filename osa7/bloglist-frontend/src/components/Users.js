@@ -1,23 +1,16 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { initUsers } from '../reducers/userReducer'
+import React from 'react'
+import { useSelector } from 'react-redux'
 
 const UserRow = ({ user }) => {
   return (
     <tr>
-      <td>{user.name}</td>
+      <td><a href={`/users/${user.id}`}>{user.name}</a></td>
       <td>{user.blogs.length}</td>
     </tr>
   )
 }
 
 const Users = () => {
-  const dispatch = useDispatch()
-
-  useEffect(() => {
-    dispatch(initUsers())
-  }, [dispatch])
-
   const users = useSelector(state => state.users.all)
 
   return (
