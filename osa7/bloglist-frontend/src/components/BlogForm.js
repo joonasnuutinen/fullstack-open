@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import Togglable from './Togglable'
-import { TextInput } from './Input'
+import { TextInput, Button } from './Input'
 import { addBlog } from '../reducers/blogReducer'
 import { notify } from '../reducers/notificationReducer'
 
@@ -34,7 +34,7 @@ const BlogForm = () => {
         <TextInput label="title" name="title" />
         <TextInput label="author" name="author" />
         <TextInput label="url" name="url" />
-        <button type="submit">create</button>
+        <Button type="submit">create</Button>
       </form>
     </Togglable>
   )

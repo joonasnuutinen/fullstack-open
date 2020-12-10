@@ -1,50 +1,62 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Switch, Route, Link } from 'react-router-dom'
+import styled from 'styled-components'
 import BlogList from './components/BlogList'
 import Blog from './components/Blog'
 import Login from './components/Login'
 import Users from './components/Users'
 import User from './components/User'
+import Notification from './components/Notification'
 import { stayLoggedIn, logout, initUsers } from './reducers/userReducer'
 import { initBlogs } from './reducers/blogReducer'
 
-const Notification = () => {
-  const message = useSelector((state => state.notification))
-  if (!message) return null
+const Nav = styled.nav`
+  background: #8bcdff;
+  color: blue;
+  padding: 5px;
+  display: flex;
+`
 
-  const colors = { success: 'green', error: 'red', default: 'blue' }
-  const type = message.type || 'default'
-  const style = {
-    padding: 10,
-    color: colors[type],
-    borderStyle: 'solid',
-    background: 'lightgray',
-  }
-  return (
-    <div style={style}>
-      {message.content}
-    </div>
-  )
-}
+const LoggedInStatus = styled.div`
+  padding: 3px 6px;
+  margin-left: auto;
+`
 
 const NavBar = ({ user, handleLogout }) => {
-  const navStyle = {
-    background: 'lightgray',
-    padding: 5
-  }
   const linkStyle = {
-    padding: 3
+    padding: '3px 6px',
+    color: 'blue',
+    textDecoration: 'none',
+    fontWeight: 'bold'
   }
 
   return (
-    <nav style={navStyle}>
+    <Nav>
       <Link style={linkStyle} to='/'>blogs</Link>
       <Link style={linkStyle} to='/users'>users</Link>
-      {user.name} logged in <button onClick={handleLogout}>logout</button>
-    </nav>
+      <LoggedInStatus>
+        Hi, {user.name.split(' ')[0]}! <a style={linkStyle} href="#" onClick={handleLogout}>logout</a>
+      </LoggedInStatus>
+    </Nav>
   )
 }
+
+const Page = styled.div``
+
+const AppTitle = styled.h2`
+  text-align: center;
+`
+
+const LoggedInArea = styled.div`
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+`
+
+const Main = styled.main`
+  padding: 0 10px;
+`
 
 const App = () => {
   const dispatch = useDispatch()
@@ -62,33 +74,35 @@ const App = () => {
   }
 
   return (
-    <div>
-      <Notification />
+    <Page>
       {user === null
         ?
         <Login />
         :
-        <div>
-          <h2>blog app</h2>
+        <LoggedInArea>
+          <Notification />
+          <AppTitle>blog app</AppTitle>
           <NavBar user={user} handleLogout={handleLogout} />
 
-          <Switch>
-            <Route path='/users/:id'>
-              <User />
-            </Route>
-            <Route path='/users'>
-              <Users />
-            </Route>
-            <Route path='/blogs/:id'>
-              <Blog />
-            </Route>
-            <Route path='/'>
-              <BlogList user={user} />
-            </Route>
-          </Switch>
-        </div>
+          <Main>
+            <Switch>
+              <Route path='/users/:id'>
+                <User />
+              </Route>
+              <Route path='/users'>
+                <Users />
+              </Route>
+              <Route path='/blogs/:id'>
+                <Blog />
+              </Route>
+              <Route path='/'>
+                <BlogList user={user} />
+              </Route>
+            </Switch>
+          </Main>
+        </LoggedInArea>
       }
-    </div>
+    </Page>
   )
 }
 

@@ -1,8 +1,16 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { TextInput, PasswordInput } from './Input'
+import styled from 'styled-components'
+import Notification from './Notification'
+import { TextInput, PasswordInput, InputContainer, Button } from './Input'
 import { notify } from '../reducers/notificationReducer'
 import { login } from '../reducers/userReducer'
+
+const Form = styled.form`
+  margin: 0 auto;
+  background: #8bcdff;
+  padding: 50px 10px;
+`
 
 const LoginForm = () => {
   const dispatch = useDispatch()
@@ -18,20 +26,29 @@ const LoginForm = () => {
   }
 
   return (
-    <form onSubmit={handleLogin}>
+    <Form onSubmit={handleLogin}>
       <TextInput label="username" name="username" />
       <PasswordInput label="password" name="password" />
-      <button type="submit">login</button>
-    </form>
+      <InputContainer>
+        <Button type="submit">login</Button>
+      </InputContainer>
+      <Notification />
+    </Form>
   )
 }
 
+const LoginPage = styled.div`
+  width: 100%;
+  max-width: 300px;
+  margin: 3em auto;
+`
+
 const Login = () => {
   return (
-    <div>
+    <LoginPage>
       <h2>log in to application</h2>
       <LoginForm />
-    </div>
+    </LoginPage>
   )
 }
 
