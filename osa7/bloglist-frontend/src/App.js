@@ -2,10 +2,12 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Switch, Route } from 'react-router-dom'
 import BlogList from './components/BlogList'
+import Blog from './components/Blog'
 import Login from './components/Login'
 import Users from './components/Users'
 import User from './components/User'
 import { stayLoggedIn, logout, initUsers } from './reducers/userReducer'
+import { initBlogs } from './reducers/blogReducer'
 
 const Notification = () => {
   const message = useSelector((state => state.notification))
@@ -40,10 +42,8 @@ const App = () => {
 
   useEffect(() => {
     dispatch(stayLoggedIn())
-  }, [])
-
-  useEffect(() => {
     dispatch(initUsers())
+    dispatch(initBlogs())
   }, [dispatch])
 
   const handleLogout = () => {
@@ -67,6 +67,9 @@ const App = () => {
             </Route>
             <Route path='/users'>
               <Users />
+            </Route>
+            <Route path='/blogs/:id'>
+              <Blog />
             </Route>
             <Route path='/'>
               <BlogList user={user} />

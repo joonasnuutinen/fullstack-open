@@ -1,12 +1,18 @@
-import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
 import { likeBlog, removeBlog } from '../reducers/blogReducer'
 import { notify } from '../reducers/notificationReducer'
 
-const Blog = ({ blog, user }) => {
-  const [showAll, setShowAll] = useState(false)
-
+const Blog = () => {
   const dispatch = useDispatch()
+
+  const [blogs, user] = useSelector(state => [state.blogs, state.users.current])
+  const id = useParams().id
+  const blog = blogs.find(b => b.id === id)
+
+  if (!blog) return null
+  console.log(blog)
 
   const handleLike = () => {
     dispatch(likeBlog(blog))
@@ -23,42 +29,24 @@ const Blog = ({ blog, user }) => {
     }
   }
 
-  const toggleShowAll = () => setShowAll(!showAll)
-  const buttonText = showAll ? 'hide' : 'view'
-
-  const style = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  }
-
   return (
-    <div style={style}>
-      {blog.title} {blog.author}
-      <button onClick={toggleShowAll}>{buttonText}</button>
-      {showAll &&
-        <>
-          <div>{blog.url}</div>
-          <div>
-            likes {blog.likes}
-            <button onClick={() => handleLike(blog)}>like</button>
-          </div>
-          {blog.user &&
-            <>
-              <div>{blog.user && blog.user.name}</div>
-              {blog.user.username === user.username &&
-                <button
-                  style={{ background: 'red', color: 'white' }}
-                  onClick={() => handleDelete(blog)}
-                >
-                  remove
-                </button>
-              }
-            </>
-          }
-        </>
+    <div>
+      <h2>{blog.title} {blog.author}</h2>
+      <div>
+        <a href={blog.url}>{blog.url}</a>
+      </div>
+      <div>
+        {blog.likes} likes
+        <button onClick={() => handleLike(blog)}>like</button>
+      </div>
+      <div>added by {blog.user.name}</div>
+      {blog.user.username === user.username &&
+        <button
+          style={{ background: 'red', color: 'white' }}
+          onClick={() => handleDelete(blog)}
+        >
+          remove
+        </button>
       }
     </div>
   )

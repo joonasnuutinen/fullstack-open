@@ -1,17 +1,17 @@
-import React, { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import Blog from './Blog'
+import React from 'react'
+import { useSelector } from 'react-redux'
 import BlogForm from './BlogForm'
-import { initBlogs } from '../reducers/blogReducer'
 
-const BlogList = ({ handleDelete, user }) => {
-  const dispatch = useDispatch()
-
+const BlogList = () => {
   const sortedBlogs = useSelector(state => state.blogs.sort((b1, b2) => b2.likes - b1.likes))
 
-  useEffect(() => {
-    dispatch(initBlogs())
-  }, [dispatch])
+  const style = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5,
+  }
 
   return (
     <div>
@@ -19,12 +19,9 @@ const BlogList = ({ handleDelete, user }) => {
       <BlogForm />
       <div id="blogs">
         {sortedBlogs.map(blog =>
-          <Blog
-            key={blog.id}
-            blog={blog}
-            handleDelete={handleDelete}
-            user={user}
-          />
+          <div key={blog.id} style={style}>
+            <a key={blog.id} href={`/blogs/${blog.id}`}>{blog.title} {blog.author}</a>
+          </div>
         )}
       </div>
     </div>
