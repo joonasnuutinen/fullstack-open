@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import Togglable from './Togglable'
 import { TextInput } from './Input'
@@ -6,22 +6,19 @@ import { addBlog } from '../reducers/blogReducer'
 import { notify } from '../reducers/notificationReducer'
 
 const BlogForm = () => {
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
-
   const dispatch = useDispatch()
 
-  const handleSubmit = async event => {
-    event.preventDefault()
+  const handleSubmit = async e => {
+    e.preventDefault()
 
-    const newBlog = { title, author, url }
+    const newBlog = {
+      title: e.target.title.value,
+      author: e.target.author.value,
+      url: e.target.url.value
+    }
 
     try {
       const storedBlog = await dispatch(addBlog(newBlog))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
       togglableRef.current.toggleVisibility()
       dispatch(notify(`a new blog ${storedBlog.title} by ${storedBlog.author} added`, 'success'))
     } catch (exception) {
@@ -34,9 +31,9 @@ const BlogForm = () => {
   return (
     <Togglable buttonLabel="new blog" ref={togglableRef}>
       <form onSubmit={handleSubmit}>
-        <TextInput label="title" value={title} name="title" setValue={setTitle} />
-        <TextInput label="author" value={author} name="author" setValue={setAuthor} />
-        <TextInput label="url" value={url} name="url" setValue={setUrl} />
+        <TextInput label="title" name="title" />
+        <TextInput label="author" name="author" />
+        <TextInput label="url" name="url" />
         <button type="submit">create</button>
       </form>
     </Togglable>

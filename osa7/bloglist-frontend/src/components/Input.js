@@ -1,14 +1,9 @@
 import React from 'react'
 
-const Input = ({ label, type, value, name, setValue }) => (
+const Input = ({ label, ...props }) => (
   <div>
     {label}
-    <input
-      type={type}
-      value={value}
-      name={name}
-      onChange={({ target }) => setValue(target.value)}
-    />
+    <input {...props} />
   </div>
 )
 
