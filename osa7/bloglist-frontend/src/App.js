@@ -3,10 +3,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import { TextInput, PasswordInput } from './components/Input'
-import blogService from './services/blogs'
-import loginService from './services/login'
 import { notify } from './reducers/notificationReducer'
 import { initBlogs } from './reducers/blogReducer'
+import { login, stayLoggedIn, logout } from './reducers/userReducer'
 
 const LoginForm = ({ username, setUsername, password, setPassword, onSubmit }) => (
   <form onSubmit={onSubmit}>
@@ -55,51 +54,33 @@ const Notification = () => {
 const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
 
   const dispatch = useDispatch()
+
+  const user = useSelector(state => state.user)
 
   useEffect(() => {
     dispatch(initBlogs())
   }, [dispatch])
 
-  const userStorageKey = 'loggedBlogAppUser'
-
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem(userStorageKey)
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      blogService.setToken(user.token)
-      setUser(user)
-    }
+    dispatch(stayLoggedIn())
   }, [])
 
   const handleLogin = async event => {
     event.preventDefault()
 
     try {
-      const user = await loginService.login({ username, password })
-      window.localStorage.setItem(
-        userStorageKey, JSON.stringify(user)
-      )
-
-      blogService.setToken(user.token)
-      setUser(user)
+      dispatch(login(username, password))
       setUsername('')
       setPassword('')
     } catch (exception) {
-      msg.error('wrong credentials')
+      dispatch(notify('wrong credentials', 'error'))
     }
   }
 
   const handleLogout = () => {
-    window.localStorage.removeItem(userStorageKey)
-    setUser(null)
-  }
-
-  const msg = {
-    success: message => dispatch(notify(message, 'success')),
-    error: message => dispatch(notify(message, 'error'))
+    dispatch(logout())
   }
 
   return (
