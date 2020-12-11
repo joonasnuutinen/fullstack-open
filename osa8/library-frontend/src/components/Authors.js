@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/client'
+import Select from 'react-select'
 import { ALL_AUTHORS, UPDATE_AUTHOR } from '../queries'
 import Loading from './Loading'
 
-const BirthyearForm = () => {
-  const [name, setName] = useState('')
+const BirthyearForm = ({ authorNames }) => {
   const [born, setBorn] = useState('')
+  const [selectedName, setSelectedName] = useState(null)
 
   const [updateAuthor] = useMutation(UPDATE_AUTHOR, {
     refetchQueries: [{ query: ALL_AUTHORS }]
@@ -13,19 +14,21 @@ const BirthyearForm = () => {
   
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('set birthyear', name, born)
-    updateAuthor({ variables: { name, setBornTo: Number(born) } })
+    updateAuthor({ variables: { name: selectedName?.value, setBornTo: Number(born) } })
 
-    setName('')
+    setSelectedName(null)
     setBorn('')
   }
 
+  const nameOptions = authorNames.map(a => { return { value: a, label: a } })
+
   return (
     <form onSubmit={handleSubmit}>
-      <div>
-        name
-        <input value={name} onChange={({ target }) => setName(target.value)} />
-      </div>
+      <Select
+        value={selectedName}
+        onChange={setSelectedName}
+        options={nameOptions}
+      />
       <div>
         born
         <input type="number" value={born} onChange={({ target }) => setBorn(target.value)} />
@@ -73,7 +76,7 @@ const Authors = (props) => {
       </table>
 
       <h3>Set birthyear</h3>
-      <BirthyearForm />
+      <BirthyearForm authorNames={authors.map(a => a.name)} />
     </div>
   )
 }
