@@ -13,7 +13,6 @@ const Books = (props) => {
   if (result.loading) {
     return <Loading />
   }
-  console.log(result)
 
   const books = result.data.allBooks
 
