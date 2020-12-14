@@ -1,0 +1,15 @@
+{
+  "name": "hello-ts",
+  "version": "1.0.0",
+  "description": "First TypeScript exercises",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Joonas Nuutinen",
+  "license": "MIT",
+  "devDependencies": {
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.3"
+  }
+}
