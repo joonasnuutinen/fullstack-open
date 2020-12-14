@@ -1,6 +1,7 @@
 import express from 'express';
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires
 const cors = require('cors');
+import diagnoseRouter from './routes/diagnoses';
 
 const app = express();
 
@@ -12,6 +13,8 @@ app.get('/api/ping', (_req, res) => {
   console.log('ping');
   res.send('pong');
 });
+
+app.use('/api/diagnoses', diagnoseRouter);
 
 const PORT = 3001;
 
