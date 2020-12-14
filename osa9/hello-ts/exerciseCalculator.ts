@@ -1,4 +1,4 @@
-interface InputValues {
+export interface InputValues {
   target: number;
   hours: Array<number>
 }
@@ -56,10 +56,15 @@ const calculateExercises = (hours: Array<number>, target: number): ResultObject 
   };
 };
 
-try {
-  const { target, hours } = parseExerciseArguments(process.argv);
-  console.log(calculateExercises(hours, target));
-} catch (e) {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  console.error('An error occurred:', e.message);
+if (require.main === module) {
+  // Called directly
+  try {
+    const { target, hours } = parseExerciseArguments(process.argv);
+    console.log(calculateExercises(hours, target));
+  } catch (e) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    console.error('An error occurred:', e.message);
+  }
 }
+
+export default calculateExercises;
