@@ -23,7 +23,7 @@ const parseExerciseArguments = (args: Array<string>): InputValues => {
   }
 
   return { target: numericValues[0], hours: numericValues.slice(1) };
-}
+};
 
 const calculateExercises = (hours: Array<number>, target: number): ResultObject => {
   const sum = hours.reduce((s, h) => s + h);
@@ -54,11 +54,12 @@ const calculateExercises = (hours: Array<number>, target: number): ResultObject 
     rating,
     ratingDescription: ratingMappings[rating]
   };
-}
+};
 
 try {
   const { target, hours } = parseExerciseArguments(process.argv);
   console.log(calculateExercises(hours, target));
 } catch (e) {
-  console.error('An error occurred:', e.message)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  console.error('An error occurred:', e.message);
 }
