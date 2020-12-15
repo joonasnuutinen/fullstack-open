@@ -1,3 +1,4 @@
+import { v1 as uuid } from 'uuid';
 import patientData from '../../data/patients.json';
 import { Patient } from '../types';
 
@@ -8,6 +9,22 @@ const getEntries = (): Omit<Patient, 'ssn'>[] => {
   return patients.map(({ ssn, ...otherFields }) => otherFields);
 };
 
+const addPatient = (
+  name: string, dateOfBirth: string, ssn: string, gender: string, occupation: string
+): Patient => {
+  const newPatient = {
+    id: uuid(),
+    name,
+    dateOfBirth,
+    ssn,
+    gender,
+    occupation,
+  };
+  patients.push(newPatient);
+  return newPatient;
+};
+
 export default {
-  getEntries
+  getEntries,
+  addPatient
 };
