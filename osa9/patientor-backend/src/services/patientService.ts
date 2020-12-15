@@ -1,6 +1,6 @@
 import { v1 as uuid } from 'uuid';
 import patientData from '../../data/patients.json';
-import { Patient, NewPatient } from '../types';
+import { Patient, NewPatient, PublicPatient } from '../types';
 import { toNewPatient } from '../utils';
 
 const patients: Patient[] = patientData.map(p => {
@@ -10,7 +10,7 @@ const patients: Patient[] = patientData.map(p => {
   return patient;
 });
 
-const getPatients = (): Omit<Patient, 'ssn'>[] => {
+const getPatients = (): PublicPatient[] => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return patients.map(({ ssn, ...otherFields }) => otherFields);
 };
