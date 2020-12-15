@@ -6,25 +6,31 @@ import { toNewPatient } from '../utils';
 const patients: Patient[] = patientData.map(p => {
   const patient = toNewPatient(p) as Patient;
   patient.id = p.id;
+  patient.entries = [];
   return patient;
 });
 
-const getEntries = (): Omit<Patient, 'ssn'>[] => {
+const getPatients = (): Omit<Patient, 'ssn'>[] => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return patients.map(({ ssn, ...otherFields }) => otherFields);
 };
 
+const getPatientById = (id: string): Patient | undefined => {
+  return patients.find(p => p.id === id);
+};
+
 const addPatient = (patient: NewPatient): Patient => {
   const newPatient = {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    ...patient,
     id: uuid(),
-    ...patient
+    entries: []
   };
   patients.push(newPatient);
   return newPatient;
 };
 
 export default {
-  getEntries,
+  getPatients,
+  getPatientById,
   addPatient
 };
