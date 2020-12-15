@@ -5,7 +5,18 @@ import { Icon } from 'semantic-ui-react';
 
 import { useStateValue, updatePatient } from '../state';
 import { apiBaseUrl } from '../constants';
-import { Patient, GenderIcon } from '../types';
+import { Patient, GenderIcon, Entry } from '../types';
+
+const EntryDisplay: React.FC<{ entry: Entry }> = ({ entry }) => (
+  <div>
+    <p>{entry.description}</p>
+    {entry.diagnosisCodes &&
+      <ul>
+        {entry.diagnosisCodes.map(code => <li key={code}>{code}</li>)}
+      </ul>
+    }
+  </div>
+);
 
 const PatientPage: React.FC = () => {
   const [{ patients }, dispatch] = useStateValue();
@@ -35,6 +46,14 @@ const PatientPage: React.FC = () => {
       <h2>{patient.name} <Icon name={GenderIcon[patient.gender]} /></h2>
       <div>ssn: {patient.ssn}</div>
       <div>occupation: {patient.occupation}</div>
+      <h3>entries</h3>
+      {patient.entries?.length > 0 ?
+        <div>
+          {patient.entries.map(entry => <EntryDisplay key={entry.id} entry={entry} />)}
+        </div>
+        :
+        <div>No entries</div>
+      }
     </div>
   );
 };
