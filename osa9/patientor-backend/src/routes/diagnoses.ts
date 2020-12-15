@@ -1,5 +1,5 @@
 import express from 'express';
-import diaryService from '../services/diagnoseService';
+import diaryService from '../services/diagnosisService';
 
 const router = express.Router();
 

@@ -1,18 +1,17 @@
 import { v1 as uuid } from 'uuid';
-import patientData from '../../data/patients.json';
+import patients from '../../data/patients';
 import { Patient, NewPatient, PublicPatient } from '../types';
-import { toNewPatient } from '../utils';
+/*import { toNewPatient } from '../utils';
 
 const patients: Patient[] = patientData.map(p => {
   const patient = toNewPatient(p) as Patient;
   patient.id = p.id;
-  patient.entries = [];
   return patient;
 });
-
+*/
 const getPatients = (): PublicPatient[] => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return patients.map(({ ssn, ...otherFields }) => otherFields);
+  return patients.map(({ ssn, entries, ...otherFields }) => otherFields);
 };
 
 const getPatientById = (id: string): Patient | undefined => {
