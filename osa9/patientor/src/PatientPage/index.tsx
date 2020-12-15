@@ -3,29 +3,31 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Icon } from 'semantic-ui-react';
 
-import { useStateValue } from '../state';
+import { useStateValue, updatePatient } from '../state';
 import { apiBaseUrl } from '../constants';
 import { Patient, GenderIcon } from '../types';
 
 const PatientPage: React.FC = () => {
   const [{ patients }, dispatch] = useStateValue();
   const { id } = useParams<{ id: string }>();
+  const patient = patients[id];
 
   React.useEffect(() => {
+    if (patient?.ssn) return; // Detailed data already fetched
+
     const fetchPatient = async () => {
       try {
         const { data: patientFromApi } = await axios.get<Patient>(
           `${apiBaseUrl}/patients/${id}`
         );
-        dispatch({ type: 'UPDATE_PATIENT', payload: patientFromApi });
+        dispatch(updatePatient(patientFromApi));
       } catch (e) {
         console.error(e);
       }
     };
     fetchPatient();
-  }, [id, dispatch]);
+  }, [dispatch, id, patient]);
   
-  const patient = patients[id];
   if (!patient) return null;
 
   return (
