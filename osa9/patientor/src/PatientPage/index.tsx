@@ -7,16 +7,22 @@ import { useStateValue, updatePatient } from '../state';
 import { apiBaseUrl } from '../constants';
 import { Patient, GenderIcon, Entry } from '../types';
 
-const EntryDisplay: React.FC<{ entry: Entry }> = ({ entry }) => (
-  <div>
-    <p>{entry.description}</p>
-    {entry.diagnosisCodes &&
-      <ul>
-        {entry.diagnosisCodes.map(code => <li key={code}>{code}</li>)}
-      </ul>
-    }
-  </div>
-);
+const EntryDisplay: React.FC<{ entry: Entry }> = ({ entry }) => {
+  const [{ diagnoses }] = useStateValue();
+  
+  return (
+    <div>
+      <p>{entry.description}</p>
+      {entry.diagnosisCodes &&
+        <ul>
+          {entry.diagnosisCodes.map(code =>
+            <li key={code}>{code} {diagnoses[code]?.name}</li>
+          )}
+        </ul>
+      }
+    </div>
+  );
+};
 
 const PatientPage: React.FC = () => {
   const [{ patients }, dispatch] = useStateValue();
