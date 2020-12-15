@@ -1,24 +1,24 @@
 import { v1 as uuid } from 'uuid';
 import patientData from '../../data/patients.json';
-import { Patient } from '../types';
+import { Patient, NewPatient } from '../types';
+import { toNewPatient } from '../utils';
 
-const patients: Array<Patient> = patientData;
+const patients: Patient[] = patientData.map(p => {
+  const patient = toNewPatient(p) as Patient;
+  patient.id = p.id;
+  return patient;
+});
 
 const getEntries = (): Omit<Patient, 'ssn'>[] => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return patients.map(({ ssn, ...otherFields }) => otherFields);
 };
 
-const addPatient = (
-  name: string, dateOfBirth: string, ssn: string, gender: string, occupation: string
-): Patient => {
+const addPatient = (patient: NewPatient): Patient => {
   const newPatient = {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     id: uuid(),
-    name,
-    dateOfBirth,
-    ssn,
-    gender,
-    occupation,
+    ...patient
   };
   patients.push(newPatient);
   return newPatient;
