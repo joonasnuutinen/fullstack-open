@@ -1,6 +1,6 @@
 import React from "react";
 import { ErrorMessage, Field, FieldProps, FormikProps } from "formik";
-import { Dropdown, DropdownProps, Form } from "semantic-ui-react";
+import { Dropdown, DropdownProps, Form, Grid, Button } from "semantic-ui-react";
 import { Diagnosis, Gender } from "../types";
 
 // structure of a single option
@@ -112,3 +112,28 @@ export const DiagnosisSelection = ({
     </Form.Field>
   );
 };
+
+interface FormButtonsProps {
+  onCancel: () => void;
+  submitDisabled: boolean;
+}
+
+export const FormButtons: React.FC<FormButtonsProps> = ({ onCancel, submitDisabled }) => (
+  <Grid>
+    <Grid.Column floated="left" width={5}>
+      <Button type="button" onClick={onCancel} color="red">
+        Cancel
+      </Button>
+    </Grid.Column>
+    <Grid.Column floated="right" width={5}>
+      <Button
+        type="submit"
+        floated="right"
+        color="green"
+        disabled={submitDisabled}
+      >
+        Add
+      </Button>
+    </Grid.Column>
+  </Grid>
+);

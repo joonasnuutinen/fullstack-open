@@ -3,8 +3,8 @@ import axios from "axios";
 import { Container, Table, Button } from "semantic-ui-react";
 import { Link } from 'react-router-dom';
 
-import { PatientFormValues } from "../AddPatientModal/AddPatientForm";
-import AddPatientModal from "../AddPatientModal";
+import AddPatientForm, { PatientFormValues } from "../AddEntityModal/AddPatientForm";
+import AddEntityModal from "../AddEntityModal";
 import { Patient } from "../types";
 import { apiBaseUrl } from "../constants";
 import HealthRatingBar from "../components/HealthRatingBar";
@@ -68,12 +68,15 @@ const PatientListPage: React.FC = () => {
           ))}
         </Table.Body>
       </Table>
-      <AddPatientModal
+      <AddEntityModal
         modalOpen={modalOpen}
-        onSubmit={submitNewPatient}
+        /*onSubmit={submitNewPatient}*/
         error={error}
         onClose={closeModal}
-      />
+        entityName="patient"
+      >
+        <AddPatientForm onSubmit={submitNewPatient} onCancel={closeModal} />
+      </AddEntityModal>
       <Button onClick={() => openModal()}>Add New Patient</Button>
     </div>
   );

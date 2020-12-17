@@ -1,9 +1,9 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Icon, Segment } from 'semantic-ui-react';
+import { Icon, Segment, Button } from 'semantic-ui-react';
 
-import { useStateValue, updatePatient } from '../state';
+import { useStateValue, updatePatient, addEntry } from '../state';
 import { apiBaseUrl } from '../constants';
 import {
   Patient,
@@ -16,6 +16,8 @@ import {
   IconColor
 } from '../types';
 import { assertNever } from '../utils';
+import AddEntityModal from '../AddEntityModal';
+import AddEntryForm, { EntryFormValues } from '../AddEntityModal/AddEntryForm';
 
 const DiagnosisList: React.FC< { diagnosisCodes: string[] } > = ({ diagnosisCodes }) => {
   const [{ diagnoses }] = useStateValue();
@@ -104,6 +106,30 @@ const PatientPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const patient = patients[id];
 
+  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string | undefined>();
+
+  const openModal = (): void => setModalOpen(true);
+
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setError(undefined);
+  };
+
+  const submitNewEntry = async (values: EntryFormValues) => {
+    try {
+      const { data: newEntry } = await axios.post<Entry>(
+        `${apiBaseUrl}/patients/${id}/entries`,
+        values
+      );
+      dispatch(addEntry(id, newEntry));
+      closeModal();
+    } catch (e) {
+      console.error(e.response.data);
+      setError(e.response.data.error);
+    }
+  };
+
   React.useEffect(() => {
     if (patient?.ssn) return; // Detailed data already fetched
 
@@ -135,6 +161,16 @@ const PatientPage: React.FC = () => {
         :
         <div>No entries</div>
       }
+      <AddEntityModal
+        modalOpen={modalOpen}
+        /*onSubmit={submitNewEntry}*/
+        error={error}
+        onClose={closeModal}
+        entityName="entry"
+      >
+        <AddEntryForm onSubmit={submitNewEntry} onCancel={closeModal} />
+      </AddEntityModal>
+      <Button onClick={() => openModal()}>Add New Entry</Button>
     </div>
   );
 };

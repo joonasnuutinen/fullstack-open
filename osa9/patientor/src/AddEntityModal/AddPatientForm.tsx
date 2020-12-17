@@ -1,8 +1,7 @@
 import React from "react";
-import { Grid, Button } from "semantic-ui-react";
 import { Field, Formik, Form } from "formik";
 
-import { TextField, SelectField, GenderOption } from "./FormField";
+import { TextField, SelectField, GenderOption, FormButtons } from "./FormField";
 import { Gender, Patient } from "../types";
 
 /*
@@ -83,23 +82,7 @@ export const AddPatientForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
               name="gender"
               options={genderOptions}
             />
-            <Grid>
-              <Grid.Column floated="left" width={5}>
-                <Button type="button" onClick={onCancel} color="red">
-                  Cancel
-                </Button>
-              </Grid.Column>
-              <Grid.Column floated="right" width={5}>
-                <Button
-                  type="submit"
-                  floated="right"
-                  color="green"
-                  disabled={!dirty || !isValid}
-                >
-                  Add
-                </Button>
-              </Grid.Column>
-            </Grid>
+            <FormButtons onCancel={onCancel} submitDisabled={!dirty || !isValid} />
           </Form>
         );
       }}
