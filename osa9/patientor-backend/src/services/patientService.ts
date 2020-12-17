@@ -1,6 +1,6 @@
 import { v1 as uuid } from 'uuid';
 import patients from '../../data/patients';
-import { Patient, NewPatient, PublicPatient } from '../types';
+import { Patient, NewPatient, PublicPatient, NewEntry, Entry } from '../types';
 /*import { toNewPatient } from '../utils';
 
 const patients: Patient[] = patientData.map(p => {
@@ -19,7 +19,7 @@ const getPatientById = (id: string): Patient | undefined => {
 };
 
 const addPatient = (patient: NewPatient): Patient => {
-  const newPatient = {
+  const newPatient: Patient = {
     ...patient,
     id: uuid(),
     entries: []
@@ -28,8 +28,23 @@ const addPatient = (patient: NewPatient): Patient => {
   return newPatient;
 };
 
+const addPatientEntry = (id: string, newEntry: NewEntry): Entry | null => {
+  const entry: Entry = {
+    ...newEntry,
+    id: uuid()
+  };
+  const patient = patients.find(p => p.id === id);
+  if (!patient) {
+    throw new Error(`Cannot find patient with id ${id}`);
+  }
+  
+  patient.entries.push(entry);
+  return entry;
+};
+
 export default {
   getPatients,
   getPatientById,
-  addPatient
+  addPatient,
+  addPatientEntry
 };

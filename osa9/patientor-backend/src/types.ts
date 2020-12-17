@@ -13,10 +13,10 @@ interface BaseEntry {
 }
 
 export enum HealthCheckRating {
-  "Healthy" = 0,
-  "LowRisk" = 1,
-  "HighRisk" = 2,
-  "CriticalRisk" = 3
+  Healthy = 0,
+  LowRisk = 1,
+  HighRisk = 2,
+  CriticalRisk = 3
 }
 
 interface HealthCheckEntry extends BaseEntry {
@@ -49,6 +49,16 @@ export type Entry =
   | HospitalEntry
   | OccupationalHealthcareEntry
   | HealthCheckEntry;
+
+export type NewBaseEntry = Omit<BaseEntry, 'id'>;
+type NewHealthCheckEntry = Omit<HealthCheckEntry, 'id'>;
+type NewHospitalEntry = Omit<HospitalEntry, 'id'>;
+type NewOccupationalHealthcareEntry = Omit<OccupationalHealthcareEntry, 'id'>;
+
+export type NewEntry =
+  | NewHealthCheckEntry
+  | NewHospitalEntry
+  | NewOccupationalHealthcareEntry;
 
 export interface Patient {
   id: string;
